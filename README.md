@@ -18,7 +18,7 @@ To segment images using thresholding...
 #### Usage
 
 ```
-Usage: segment.exe [params] input_image output_image
+Usage: map_segment.exe [params] input_image output_image
 
         -b, --blur
                 Blur Output Image
@@ -31,7 +31,7 @@ Usage: segment.exe [params] input_image output_image
         -m, --manual
                 Manual Filter Mode
 
-        input_image (value:<none>)
+        input_image (value:images/usa.png)
                 Input Image
         output_image (value:<none>)
                 Output Image

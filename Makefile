@@ -13,18 +13,18 @@ OBJECTS = $(patsubst %.cpp, %.o, ${SOURCES})
 
 default: all
 
-all: segment
+all: map_segment
 
 %.o: %.cpp $(DEPS)
 	${CC} -c $^ -I ${IDIR} -I ${IOPENCV}
 
-segment: $(OBJECTS)
+map_segment: $(OBJECTS)
 	$(CC) -o $@ $^ $(CFLAGS)
 
 clean:
 	$(RM) $(OBJECTS) ${wildcard ${IDIR}/*.gch}
 
 destroy:
-	$(RM) $(OBJECTS) segment segment.exe ${wildcard ${IDIR}/*.gch}
+	$(RM) $(OBJECTS) map_segment map_segment.exe ${wildcard ${IDIR}/*.gch}
 
 # https://www.cs.colby.edu/maxwell/courses/tutorials/maketutor/

@@ -1,4 +1,4 @@
-// segment.cpp : This file contains the 'main' function. Program execution begins and ends there.
+// map_segment.cpp : This file contains the 'main' function. Program execution begins and ends there.
 // Austin Hester CS642o mar 2021
 // g++.exe (x86_64-posix-seh-rev0, Built by MinGW-W64 project) 8.1.0
 
@@ -55,11 +55,16 @@ main(int argc, const char** argv)
     );
     if (parse_result != 1) return parse_result;
 
-    cv::Mat input_image = open_image( input_image_filename, true );
+    cv::Mat input_image = open_image( input_image_filename );
+
+    // crop if odd resolution
+    input_image = input_image(
+        cv::Rect( 0, 0, input_image.cols & -2, input_image.rows & -2 )
+    );
 
     // double the input size if given 'd' flag
     if (double_input_size) {
-        cv::resize( input_image, input_image, input_image.size() * 2);
+        cv::resize( input_image, input_image, input_image.size() / 2);
     }
 
     cv::imshow( WINDOW_NAME + " Input Image", input_image );
