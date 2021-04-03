@@ -14,14 +14,14 @@ parse_arguments(
     const char** argv,
     std::string* input_image_filename,
     std::string* output_image_filename,
-    bool* double_input_size,
+    float* scale_image_value,
     bool* blur_output,
     bool* equalize_output
 ) {
     cv::String keys =
         "{@input_image    |<none>| Input Image}"
         "{@output_image   |<none>| Output Image}"
-        "{double d        |      | Double Input Image Size}"
+        "{scale s         |1.f   | Scale Input Image Size}"
         "{blur b          |      | Blur Output Image}"
         "{equalize e      |      | Equalize Output Image}"
         "{help h          |      | Show Help Message}";
@@ -41,7 +41,7 @@ parse_arguments(
 
     try {
         *input_image_filename = (std::string) parser.get<std::string>(0).c_str();
-        assert(input_image_filename->size() > 0);
+        assert( input_image_filename->size() > 0 );
     } catch (...) {
         std::cerr << "Failed to parse imagefile argument!:" << std::endl;
         return -1;
@@ -58,9 +58,10 @@ parse_arguments(
     }
 
     try {
-        *double_input_size = parser.has("d");
+        *scale_image_value = (float) parser.get<float>("s");
+        assert( *scale_image_value > 0.f && *scale_image_value < 10.f );
     } catch (...) {
-        std::cerr << "Failed to parse double argument!:" << std::endl;
+        std::cerr << "Failed to parse scale argument!:" << std::endl;
         return -1;
     }
 

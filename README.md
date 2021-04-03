@@ -22,14 +22,14 @@ Usage: map_segment.exe [params] input_image output_image
 
         -b, --blur
                 Blur Output Image
-        -d, --double
-                Double Input Image Size
         -e, --equalize
                 Equalize Output Image
         -h, --help (value:true)
                 Show Help Message
+        -s, --scale (value:1.f)
+                Scale Input Image Size
 
-        input_image (value:<none>)
+        input_image (value:images/usa.png)
                 Input Image
         output_image (value:<none>)
                 Output Image

@@ -9,6 +9,7 @@
 #include <iostream>
 #include <vector>
 
+#include "./include/affine.hpp"
 #include "./include/cla_parse.hpp"
 #include "./include/dir_func.hpp"
 #include "./include/segment_helper.hpp"
@@ -38,7 +39,7 @@ main(int argc, const char** argv)
     // CLA variables
     std::string input_image_filename;
     // CLA flags
-    bool double_input_size;
+    float scale_image_value;
     bool blur_output;
     bool equalize_output;
 
@@ -47,7 +48,7 @@ main(int argc, const char** argv)
         argc, argv,
         &input_image_filename,
         &output_image_filename,
-        &double_input_size,
+        &scale_image_value,
         &blur_output,
         &equalize_output
     );
@@ -61,8 +62,9 @@ main(int argc, const char** argv)
     );
 
     // double the input size if given 'd' flag
-    if (double_input_size) {
-        cv::resize( input_image, input_image, input_image.size() / 2);
+    if (scale_image_value != 1.f) {
+        // cv::resize( input_image, input_image, input_image.size() / 2);
+        input_image = resize_affine( input_image, scale_image_value );
     }
 
     cv::imshow( WINDOW_NAME + " Input Image", input_image );

@@ -13,7 +13,7 @@ int parse_arguments(
     const char** argv,
     std::string* input_image_filename,
     std::string* output_image_filename,
-    bool* double_input_size,
+    float* scale_image_value,
     bool* blur_output,
     bool* equalize_output
 );
