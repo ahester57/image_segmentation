@@ -16,8 +16,7 @@ parse_arguments(
     std::string* output_image_filename,
     bool* double_input_size,
     bool* blur_output,
-    bool* equalize_output,
-    bool* manual_mode
+    bool* equalize_output
 ) {
     cv::String keys =
         "{@input_image    |<none>| Input Image}"
@@ -25,7 +24,6 @@ parse_arguments(
         "{double d        |      | Double Input Image Size}"
         "{blur b          |      | Blur Output Image}"
         "{equalize e      |      | Equalize Output Image}"
-        "{manual m        |      | Manual Filter Mode}"
         "{help h          |      | Show Help Message}";
 
     cv::CommandLineParser parser(argc, argv, keys);
@@ -52,7 +50,7 @@ parse_arguments(
     try {
         *output_image_filename = (std::string) parser.get<std::string>(1).c_str();
         if (output_image_filename->size() == 0) {
-            *output_image_filename = "filtered_" + *input_image_filename;
+            *output_image_filename = "output_" + *input_image_filename;
         }
     } catch (...) {
         std::cerr << "Failed to parse templatefile argument!:" << std::endl;
@@ -77,13 +75,6 @@ parse_arguments(
         *equalize_output = parser.has("e");
     } catch (...) {
         std::cerr << "Failed to parse equalize argument!:" << std::endl;
-        return -1;
-    }
-
-    try {
-        *manual_mode = parser.has("m");
-    } catch (...) {
-        std::cerr << "Failed to parse manual argument!:" << std::endl;
         return -1;
     }
 

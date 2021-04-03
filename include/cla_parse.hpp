@@ -15,8 +15,7 @@ int parse_arguments(
     std::string* output_image_filename,
     bool* double_input_size,
     bool* blur_output,
-    bool* equalize_output,
-    bool* manual_mode
+    bool* equalize_output
 );
 
 #endif

@@ -22,7 +22,7 @@ std::string output_image_filename;
 
 
 cv::Mat
-segment(cv::Mat image, bool manual_mode)
+segment(cv::Mat image)
 {
     // initialize images
     cv::Size input_image_size = image.size();
@@ -41,7 +41,6 @@ main(int argc, const char** argv)
     bool double_input_size;
     bool blur_output;
     bool equalize_output;
-    bool manual_mode;
 
     // parse and save command line args
     int parse_result = parse_arguments(
@@ -50,8 +49,7 @@ main(int argc, const char** argv)
         &output_image_filename,
         &double_input_size,
         &blur_output,
-        &equalize_output,
-        &manual_mode
+        &equalize_output
     );
     if (parse_result != 1) return parse_result;
 
@@ -69,7 +67,7 @@ main(int argc, const char** argv)
 
     cv::imshow( WINDOW_NAME + " Input Image", input_image );
 
-    cv::Mat output_image = segment( input_image, manual_mode );
+    cv::Mat output_image = segment( input_image );
 
     // blur the output if given 'b' flag
     if (blur_output) {

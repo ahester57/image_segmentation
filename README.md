@@ -28,10 +28,8 @@ Usage: map_segment.exe [params] input_image output_image
                 Equalize Output Image
         -h, --help (value:true)
                 Show Help Message
-        -m, --manual
-                Manual Filter Mode
 
-        input_image (value:images/usa.png)
+        input_image (value:<none>)
                 Input Image
         output_image (value:<none>)
                 Output Image
@@ -40,4 +38,4 @@ Usage: map_segment.exe [params] input_image output_image
 
 ----
 
-https://github.com/ahester57/frequency_filter
+https://github.com/ahester57/image_segmentation
