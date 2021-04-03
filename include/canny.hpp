@@ -1,0 +1,12 @@
+// canny.hpp : Canny Edge Detections
+// Austin Hester CS642o april 2021
+// g++.exe (x86_64-posix-seh-rev0, Built by MinGW-W64 project) 8.1.0
+
+#ifndef CANNY_H
+#define CANNY_H
+
+#include <opencv2/core/core.hpp>
+
+cv::Mat draw_canny_contours(cv::Mat magnitude_image);
+
+#endif

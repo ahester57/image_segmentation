@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "./include/affine.hpp"
+#include "./include/canny.hpp"
 #include "./include/cla_parse.hpp"
 #include "./include/dir_func.hpp"
 #include "./include/segment_helper.hpp"
@@ -28,8 +29,9 @@ segment(cv::Mat image)
     // initialize images
     cv::Size input_image_size = image.size();
 
+    cv::Mat canny_edges = draw_canny_contours( image );
 
-    return image;
+    return canny_edges;
 }
 
 
@@ -54,7 +56,7 @@ main(int argc, const char** argv)
     );
     if (parse_result != 1) return parse_result;
 
-    cv::Mat input_image = open_image( input_image_filename );
+    cv::Mat input_image = open_image( input_image_filename, true );
 
     // crop if odd resolution
     input_image = input_image(
