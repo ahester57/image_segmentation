@@ -13,6 +13,7 @@
 #include "./include/canny.hpp"
 #include "./include/cla_parse.hpp"
 #include "./include/dir_func.hpp"
+#include "./include/hsv_convert.hpp"
 #include "./include/segment_helper.hpp"
 
 #define DEBUG 1
@@ -29,7 +30,13 @@ segment(cv::Mat image)
     // initialize images
     cv::Size input_image_size = image.size();
 
-    cv::Mat canny_edges = draw_canny_contours( image );
+    cv::Mat hsv_image;
+    bgr_to_hsv( image, &hsv_image );
+
+    cv::Mat planes[3];
+    cv::split( hsv_image, planes );
+
+    cv::Mat canny_edges = draw_canny_contours( planes[1] ); // for usa.png, saturation is best to use
 
     return canny_edges;
 }
@@ -56,7 +63,7 @@ main(int argc, const char** argv)
     );
     if (parse_result != 1) return parse_result;
 
-    cv::Mat input_image = open_image( input_image_filename, true );
+    cv::Mat input_image = open_image( input_image_filename );
 
     // crop if odd resolution
     input_image = input_image(

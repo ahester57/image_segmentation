@@ -13,24 +13,26 @@
 cv::Mat
 draw_canny_contours(cv::Mat image)
 {
-    cv::Mat canny_output;
     // blur image
+    cv::Mat canny_output;
     cv::GaussianBlur( image, canny_output, cv::Size( 3, 3 ), 0.5f );
-    cv::imshow(" Contours Image", canny_output );
 
+    // compute canny edges
+    // cv::imshow(" Canny Input Image", canny_output );
     cv::Canny( canny_output, canny_output, 75, 200 );
 
+    // find the contours to draw
     std::vector<std::vector<cv::Point>> contours;
     std::vector<cv::Vec4i> hierarchy;
     cv::findContours( canny_output, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE );
 
+    // draw the contours
     cv::Mat canvas = cv::Mat::zeros( canny_output.size(), CV_8U );
     for (size_t i = 0; i < contours.size(); i++) {
         cv::drawContours( canvas, contours, i, cv::Scalar(255), 1, cv::LINE_8, hierarchy, 0 );
     }
 
-    // cv::imshow(" Contours Image", canvas );
-
+    // cv::imshow(" Canny Output Image", canvas );
     canny_output.release();
     return canvas;
 }
