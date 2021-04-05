@@ -3,10 +3,10 @@
 // g++.exe (x86_64-posix-seh-rev0, Built by MinGW-W64 project) 8.1.0
 
 #include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include "./include/canny.hpp"
-#include <opencv2/highgui/highgui.hpp>
 
 
 // draw contours of canny edge detection
@@ -18,7 +18,7 @@ draw_canny_contours(cv::Mat image)
     cv::GaussianBlur( image, canny_output, cv::Size( 3, 3 ), 0.5f );
 
     // compute canny edges
-    // cv::imshow(" Canny Input Image", canny_output );
+    cv::imshow(" Canny Input Image", canny_output );
     cv::Canny( canny_output, canny_output, 75, 200 );
 
     // find the contours to draw
@@ -29,7 +29,7 @@ draw_canny_contours(cv::Mat image)
     // draw the contours
     cv::Mat canvas = cv::Mat::zeros( canny_output.size(), CV_8U );
     for (size_t i = 0; i < contours.size(); i++) {
-        cv::drawContours( canvas, contours, i, cv::Scalar(255), 1, cv::LINE_8, hierarchy, 0 );
+        cv::drawContours( canvas, contours, i, cv::Scalar(255), 2, cv::LINE_8, hierarchy, 0 );
     }
 
     // cv::imshow(" Canny Output Image", canvas );

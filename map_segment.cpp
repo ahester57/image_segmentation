@@ -38,6 +38,7 @@ segment(cv::Mat image)
 
     cv::Mat canny_edges = draw_canny_contours( planes[1] ); // for usa.png, saturation is best to use
 
+    hsv_image.release();
     return canny_edges;
 }
 
@@ -97,6 +98,7 @@ main(int argc, const char** argv)
     while (wait_key());
 
     cv::destroyAllWindows();
+    input_image.release();
     output_image.release();
 
     return 0;

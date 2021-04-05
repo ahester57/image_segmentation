@@ -7,6 +7,19 @@
 
 #include "./include/affine.hpp"
 
+/*
+    Make a right triangle
+*/
+cv::Point2f*
+make_right_triangle(float a, float b)
+{
+    cv::Point2f* points = (cv::Point2f*) malloc( sizeof(cv::Point2f) * 3 );
+    points[0] = cv::Point2f( 0.f, 0.f );
+    points[1] = cv::Point2f( a, 0.f );
+    points[2] = cv::Point2f( 0.f, b );
+    return points;
+}
+
 
 cv::Mat
 resize_affine(cv::Mat src, float scale)
@@ -14,15 +27,9 @@ resize_affine(cv::Mat src, float scale)
     // if we have more than 8k in the future, then my only question is why? what's the point?
     assert( src.rows * scale <= 7680 && src.cols * scale <= 7680 );
 
-    cv::Point2f src_points[3];
-    src_points[0] = cv::Point2f( 0.f, 0.f );
-    src_points[1] = cv::Point2f( src.cols - 1.f, 0.f );
-    src_points[2] = cv::Point2f( 0.f, src.rows - 1.f );
-
-    cv::Point2f dst_points[3];
-    dst_points[0] = cv::Point2f( 0.f, 0.f );
-    dst_points[1] = cv::Point2f( src.cols * scale, 0.f );
-    dst_points[2] = cv::Point2f( 0.f, src.rows * scale );
+    // save these to a variable so we can delete them later, thanks C
+    cv::Point2f* src_points = make_right_triangle( src.cols - 1.f, src.rows - 1.f );
+    cv::Point2f* dst_points = make_right_triangle( src.cols * scale, src.rows * scale );
 
     cv::Mat warp_mat = cv::getAffineTransform( src_points, dst_points );
 
@@ -31,5 +38,8 @@ resize_affine(cv::Mat src, float scale)
     cv::warpAffine( src, warp_dst, warp_mat, warp_dst.size() );
 
     warp_mat.release();
+    delete src_points;
+    delete dst_points;
+
     return warp_dst;
 }
