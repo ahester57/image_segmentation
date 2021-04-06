@@ -55,22 +55,11 @@ segment(MapData* map_data, bool grayscale, int hsv_plane = 2)
     // apply watershed algorithm
     cv::watershed( *map_data->whole_map, *map_data->markers );
 
-    // cv::Mat markers_8U;
-    // map_data->markers->convertTo( markers_8U, CV_8U, 3 );
-    // cv::bitwise_and( markers_8U, ~mask, markers_8U );
-
-
-    // generate random colors
-    std::vector<cv::Vec3b> colors;
-    cv::theRNG().state = cv::getTickCount();
-    for (size_t i = 0; i < map_data->contours->size(); i++)
-    {
-        colors.push_back( cv::Vec3b(
-            (uchar) cv::theRNG().uniform(0, 256),
-            (uchar) cv::theRNG().uniform(0, 256),
-            (uchar) cv::theRNG().uniform(0, 256)
-        ));
-    }
+    cv::Mat markers_8U;
+    map_data->markers->convertTo( markers_8U, CV_8U, 3 );
+    cv::bitwise_and( markers_8U, ~mask, markers_8U );
+    cv::imshow( "Markers 8U", markers_8U );
+    markers_8U.release();
 
     cv::Mat result = cv::Mat::zeros( map_data->markers->size(), CV_8UC3 );
 
@@ -81,13 +70,12 @@ segment(MapData* map_data, bool grayscale, int hsv_plane = 2)
         {
             int pixel = map_data->markers->at<int>( i, j );
             if (pixel > 0 && pixel <= static_cast<int>(map_data->contours->size())) {
-                result.at<cv::Vec3b>( i, j ) = *map_data->whole_map->at<cv::Vec3b>( i, j );
+                result.at<cv::Vec3b>( i, j ) = map_data->whole_map->at<cv::Vec3b>( i, j );
             }
         }
     }
 
     mask.release();
-    // markers_8U.release();
     return result;
 }
 
