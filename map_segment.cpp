@@ -25,40 +25,39 @@ std::string output_image_filename;
 
 
 cv::Mat
-segment(cv::Mat image)
+segment(MapData* map_data)
 {
-    cv::Size input_image_size = image.size();
+    cv::Size input_image_size = map_data->whole_map->size();
 
     // create mask, only distance filter on foreground
     //TODO make this better at background detection, not just black backgrounds
-    cv::Mat mask = make_background_mask( image );
+    cv::Mat mask = make_background_mask( *map_data->whole_map );
 
     // canny edge detection, returning contour map
-    cv::Mat canny_edges = draw_color_canny_contours( image, 1 ); // for usa.png, saturation is best to use
+    cv::Mat canny_edges = draw_color_canny_contours( *map_data->whole_map, 1 ); // for usa.png, saturation is best to use
 
     // create bordered map
     cv::Mat borders = create_bordered_map( canny_edges, mask );
+    canny_edges.release();
 
     // distance transform on thresholded
     cv::Mat distance = distance_finder( borders );
+    borders.release();
 
-    std::vector<std::vector<cv::Point>> contours = find_contours( distance );
+    map_data->contours = find_contours( distance );
 
     // create markers for foreground objects // aka "markers"
-    cv::Mat markers = draw_markers( contours, distance.size() );
+    map_data->markers = draw_markers( *map_data->contours, distance.size() );
+    distance.release();
 
     // apply watershed algorithm
-    cv::watershed( image, markers );
+    cv::watershed( *map_data->whole_map, *map_data->markers );
 
     cv::Mat markers_8U;
-    markers.convertTo( markers_8U, CV_8U, 3 );
+    map_data->markers->convertTo( markers_8U, CV_8U, 3 );
     cv::bitwise_and( markers_8U, ~mask, markers_8U );
 
-    canny_edges.release();
     mask.release();
-    borders.release();
-    distance.release();
-    markers.release();
     return markers_8U;
 }
 
@@ -106,7 +105,7 @@ main(int argc, const char** argv)
     while (wait_key());
 
     // segment the image
-    cv::Mat output_image = segment( input_image );
+    cv::Mat output_image = segment( &map_data );
 
     // blur the output if given 'b' flag
     if (blur_output) {
@@ -124,7 +123,14 @@ main(int argc, const char** argv)
     // 'event loop' for keypresses
     while (wait_key());
 
+
     cv::destroyAllWindows();
+
+    map_data.region_of_interest->release();
+    map_data.markers->release();
+    delete map_data.contours;
+    delete map_data.markers;
+
     input_image.release();
     output_image.release();
 

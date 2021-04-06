@@ -8,13 +8,27 @@
 #include <opencv2/core/core.hpp>
 
 #include <vector>
-#include <iostream>
+
+
+typedef struct {
+    const std::string* window_name;
+    cv::Mat* whole_map;
+    cv::Mat* region_of_interest;
+    std::vector<std::vector<cv::Point>>* contours;
+    cv::Mat* markers;
+} MapData;
+
 
 int wait_key();
+
 cv::Mat distance_finder(cv::Mat borders);
+
 cv::Mat make_background_mask(cv::Mat image);
+
 cv::Mat create_bordered_map(cv::Mat canny_edges, cv::Mat mask);
-std::vector<std::vector<cv::Point>> find_contours(cv::Mat distance_transform);
-cv::Mat draw_markers(std::vector<std::vector<cv::Point>> contours, cv::Size canvas_size);
+
+std::vector<std::vector<cv::Point>>* find_contours(cv::Mat distance_transform);
+
+cv::Mat* draw_markers(std::vector<std::vector<cv::Point>> contours, cv::Size canvas_size);
 
 #endif
