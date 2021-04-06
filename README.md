@@ -26,6 +26,8 @@ Usage: map_segment.exe [params] input_image output_image
                 Equalize Output Image
         -h, --help (value:true)
                 Show Help Message
+        --hsv_plane, -p (value:2)
+                HSV Plane to Use: 0 = H, 1 = S, 2 = V
         -s, --scale (value:1.f)
                 Scale Input Image Size
 

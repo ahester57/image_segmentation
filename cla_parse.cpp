@@ -3,6 +3,7 @@
 // g++.exe (x86_64-posix-seh-rev0, Built by MinGW-W64 project) 8.1.0
 
 #include <opencv2/core/core.hpp>
+#include <iostream>
 
 #include "./include/cla_parse.hpp"
 
@@ -16,7 +17,8 @@ parse_arguments(
     std::string* output_image_filename,
     float* scale_image_value,
     bool* blur_output,
-    bool* equalize_output
+    bool* equalize_output,
+    int* hsv_plane
 ) {
     cv::String keys =
         "{@input_image    |<none>| Input Image}"
@@ -24,6 +26,7 @@ parse_arguments(
         "{scale s         |1.f   | Scale Input Image Size}"
         "{blur b          |      | Blur Output Image}"
         "{equalize e      |      | Equalize Output Image}"
+        "{hsv_plane p     |2     | HSV Plane to Use: 0 = H, 1 = S, 2 = V}"
         "{help h          |      | Show Help Message}";
 
     cv::CommandLineParser parser(argc, argv, keys);
@@ -76,6 +79,14 @@ parse_arguments(
         *equalize_output = parser.has("e");
     } catch (...) {
         std::cerr << "Failed to parse equalize argument!:" << std::endl;
+        return -1;
+    }
+
+    try {
+        *hsv_plane = (float) parser.get<int>("p");
+        assert( *hsv_plane >= 0 && *hsv_plane <= 2 );
+    } catch (...) {
+        std::cerr << "Failed to parse scale argument!:" << std::endl;
         return -1;
     }
 

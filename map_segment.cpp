@@ -25,7 +25,7 @@ std::string output_image_filename;
 
 
 cv::Mat
-segment(MapData* map_data)
+segment(MapData* map_data, int hsv_plane)
 {
     cv::Size input_image_size = map_data->whole_map->size();
 
@@ -34,7 +34,7 @@ segment(MapData* map_data)
     cv::Mat mask = make_background_mask( *map_data->whole_map );
 
     // canny edge detection, returning contour map
-    cv::Mat canny_edges = draw_color_canny_contours( *map_data->whole_map, 1 ); // for usa.png, saturation is best to use
+    cv::Mat canny_edges = draw_color_canny_contours( *map_data->whole_map, hsv_plane ); // for usa.png, saturation is best to use
 
     // create bordered map
     cv::Mat borders = create_bordered_map( canny_edges, mask );
@@ -99,6 +99,7 @@ main(int argc, const char** argv)
     float scale_image_value;
     bool blur_output;
     bool equalize_output;
+    int hsv_plane;
 
     // parse and save command line args
     int parse_result = parse_arguments(
@@ -107,7 +108,8 @@ main(int argc, const char** argv)
         &output_image_filename,
         &scale_image_value,
         &blur_output,
-        &equalize_output
+        &equalize_output,
+        &hsv_plane
     );
     if (parse_result != 1) return parse_result;
 
@@ -133,7 +135,7 @@ main(int argc, const char** argv)
     while (wait_key());
 
     // segment the image
-    cv::Mat output_image = segment( &map_data );
+    cv::Mat output_image = segment( &map_data, hsv_plane );
 
     // blur the output if given 'b' flag
     if (blur_output) {

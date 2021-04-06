@@ -6,7 +6,6 @@
 #define CLA_PARSE_H
 
 #include <opencv2/core/core.hpp>
-#include <iostream>
 
 int parse_arguments(
     int argc,
@@ -15,7 +14,8 @@ int parse_arguments(
     std::string* output_image_filename,
     float* scale_image_value,
     bool* blur_output,
-    bool* equalize_output
+    bool* equalize_output,
+    int* plane
 );
 
 #endif
