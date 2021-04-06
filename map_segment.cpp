@@ -34,7 +34,7 @@ segment(cv::Mat image)
     cv::Mat mask = make_background_mask( image );
 
     // canny edge detection, returning contour map
-    cv::Mat canny_edges = draw_color_canny_contours( image ); // for usa.png, saturation is best to use
+    cv::Mat canny_edges = draw_color_canny_contours( image, 1 ); // for usa.png, saturation is best to use
 
     // create bordered map
     cv::Mat borders = create_bordered_map( canny_edges, mask );
@@ -42,11 +42,17 @@ segment(cv::Mat image)
     // distance transform on thresholded
     cv::Mat distance = distance_finder( borders );
 
+    std::vector<std::vector<cv::Point>> contours = find_contours( distance );
+
     // create markers for foreground objects // aka "markers"
-    cv::Mat markers = draw_markers( distance );
+    cv::Mat markers = draw_markers( contours, distance.size() );
+
+    // apply watershed algorithm
+    cv::watershed( image, markers );
 
     cv::Mat markers_8U;
-    markers.convertTo( markers_8U, CV_8U );
+    markers.convertTo( markers_8U, CV_8U, 3 );
+    cv::bitwise_and( markers_8U, ~mask, markers_8U );
 
     canny_edges.release();
     mask.release();

@@ -38,8 +38,15 @@ draw_canny_contours(cv::Mat image)
     return canvas;
 }
 
+/**
+ * plane: 
+ * 0 = Hue
+ * 1 = Saturation
+ * 2 = Vintensity
+ * 
+**/
 cv::Mat
-draw_color_canny_contours(cv::Mat image)
+draw_color_canny_contours(cv::Mat image, int plane)
 {
     // Convert to HSV
     cv::Mat hsv_image;
@@ -50,10 +57,7 @@ draw_color_canny_contours(cv::Mat image)
     cv::split( hsv_image, hsv_planes );
 
     // canny edge detection, returning contour map
-    cv::Mat canny_edges;
-    //return = draw_canny_contours( hsv_planes[0] );    // hue
-    canny_edges = draw_canny_contours( hsv_planes[1] );        // saturation, for usa.png, saturation is best to use
-    //return = draw_canny_contours( hsv_planes[2] );    // vintensity
+    cv::Mat canny_edges = draw_canny_contours( hsv_planes[plane] );
 
     hsv_planes[0].release();
     hsv_planes[1].release();
