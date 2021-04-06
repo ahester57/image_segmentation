@@ -18,11 +18,13 @@ parse_arguments(
     float* scale_image_value,
     bool* blur_output,
     bool* equalize_output,
-    int* hsv_plane
+    int* hsv_plane,
+    bool* grayscale
 ) {
     cv::String keys =
         "{@input_image    |<none>| Input Image}"
         "{@output_image   |<none>| Output Image}"
+        "{grayscale g     |      | Read Input As Grayscale}"
         "{scale s         |1.f   | Scale Input Image Size}"
         "{equalize e      |      | Equalize Output Image}"
         "{blur b          |      | Blur Output Image}"
@@ -87,6 +89,14 @@ parse_arguments(
         assert( *hsv_plane >= 0 && *hsv_plane <= 2 );
     } catch (...) {
         std::cerr << "Failed to parse hsv_plane argument!:" << std::endl;
+        return -1;
+    }
+
+    try {
+        *grayscale = parser.has("g");
+        assert( *grayscale >= 0 && *grayscale <= 2 );
+    } catch (...) {
+        std::cerr << "Failed to parse grayscale argument!:" << std::endl;
         return -1;
     }
 

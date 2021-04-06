@@ -15,7 +15,8 @@ int parse_arguments(
     float* scale_image_value,
     bool* blur_output,
     bool* equalize_output,
-    int* plane
+    int* plane,
+    bool* grayscale
 );
 
 #endif

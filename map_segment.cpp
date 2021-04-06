@@ -25,7 +25,7 @@ std::string output_image_filename;
 
 
 cv::Mat
-segment(MapData* map_data, int hsv_plane)
+segment(MapData* map_data, bool grayscale, int hsv_plane = 2)
 {
     cv::Size input_image_size = map_data->whole_map->size();
 
@@ -35,7 +35,8 @@ segment(MapData* map_data, int hsv_plane)
 //TODO return a pointer and save to map_data
 
     // canny edge detection, returning contour map
-    cv::Mat canny_edges = draw_color_canny_contours( *map_data->whole_map, hsv_plane ); // for usa.png, saturation is best to use imo
+    cv::Mat canny_edges = grayscale ? draw_canny_contours( *map_data->whole_map )
+                                    : draw_color_canny_contours( *map_data->whole_map, hsv_plane ); // for usa.png, saturation is best to use imo
 
     // // create bordered map
     cv::Mat borders = create_bordered_map( canny_edges, mask );
@@ -80,7 +81,11 @@ segment(MapData* map_data, int hsv_plane)
         {
             int pixel = map_data->markers->at<int>( i, j );
             if (pixel > 0 && pixel <= static_cast<int>(map_data->contours->size())) {
-                result.at<cv::Vec3b>( i, j ) = colors[ pixel -1 ];
+                result.at<cv::Vec3b>( i, j ) = cv::Vec3b(
+            (uchar) cv::theRNG().uniform(0, 256),
+            (uchar) cv::theRNG().uniform(0, 256),
+            (uchar) cv::theRNG().uniform(0, 256)
+        );//colors[ pixel -1 ];
             }
         }
     }
@@ -101,7 +106,7 @@ main(int argc, const char** argv)
     bool blur_output;
     bool equalize_output;
     int hsv_plane;
-    bool grayscale = false;
+    bool grayscale;
 
     // parse and save command line args
     int parse_result = parse_arguments(
@@ -111,7 +116,8 @@ main(int argc, const char** argv)
         &scale_image_value,
         &blur_output,
         &equalize_output,
-        &hsv_plane
+        &hsv_plane,
+        &grayscale
     );
     if (parse_result != 1) return parse_result;
 
@@ -138,7 +144,7 @@ main(int argc, const char** argv)
     while (wait_key());
 
     // segment the image
-    cv::Mat output_image = segment( &map_data, hsv_plane );
+    cv::Mat output_image = segment( &map_data, grayscale, hsv_plane );
 
     // blur the output if given 'b' flag
     if (blur_output) {
