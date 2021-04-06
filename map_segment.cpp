@@ -29,30 +29,24 @@ segment(cv::Mat image)
 {
     cv::Size input_image_size = image.size();
 
-    // canny edge detection, returning contour map
-    cv::Mat canny_edges;
-    canny_edges = draw_color_canny_contours( image ); // for usa.png, saturation is best to use
-
-    cv::Mat canny_edges_8U; // aka "borders"
-    canny_edges.convertTo( canny_edges_8U, CV_8U, 100 );
-    cv::bitwise_not( canny_edges_8U, canny_edges_8U );
-
-    // apply map mask
+    // create mask, only distance filter on foreground
     //TODO make this better at background detection, not just black backgrounds
-    cv::Mat mask;
-    cv::inRange( image, cv::Scalar::all(0), cv::Scalar::all(0), mask );
-    canny_edges_8U.setTo( cv::Scalar(0, 0, 0), mask );
-    cv::threshold( canny_edges_8U, canny_edges_8U, 40, 255, cv::THRESH_BINARY | cv::THRESH_OTSU );
+    cv::Mat mask = make_background_mask( image );
+
+    // canny edge detection, returning contour map
+    cv::Mat canny_edges = draw_color_canny_contours( image ); // for usa.png, saturation is best to use
+
+    // create bordered map
+    cv::Mat borders = create_bordered_map( canny_edges, mask );
 
     // distance transform on thresholded
-    cv::Mat distance;
-    cv::distanceTransform( canny_edges_8U, distance, cv::DIST_L2, 3 );
-    cv::normalize( distance, distance, 0.f, 1.f, cv::NORM_MINMAX );
-    // cv::threshold( distance, distance, 0.f, 1.f, cv::THRESH_BINARY );
-    cv::normalize( distance, distance, 0.f, 1.f, cv::NORM_MINMAX );
+    cv::Mat distance = distance_finder( borders );
 
     // create markers for foreground objects // aka "markers"
 
+    canny_edges.release();
+    mask.release();
+    borders.release();
     return distance;
 }
 
@@ -85,9 +79,8 @@ main(int argc, const char** argv)
         cv::Rect( 0, 0, input_image.cols & -2, input_image.rows & -2 )
     );
 
-    // double the input size if given 'd' flag
+    // scale the input size if given 's' flag
     if (scale_image_value != 1.f) {
-        // cv::resize( input_image, input_image, input_image.size() / 2);
         input_image = resize_affine( input_image, scale_image_value );
     }
 
@@ -100,6 +93,7 @@ main(int argc, const char** argv)
     // 'event loop' for keypresses
     while (wait_key());
 
+    // segment the image
     cv::Mat output_image = segment( input_image );
 
     // blur the output if given 'b' flag
