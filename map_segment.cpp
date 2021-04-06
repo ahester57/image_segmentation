@@ -43,11 +43,17 @@ segment(cv::Mat image)
     cv::Mat distance = distance_finder( borders );
 
     // create markers for foreground objects // aka "markers"
+    cv::Mat markers = draw_markers( distance );
+
+    cv::Mat markers_8U;
+    markers.convertTo( markers_8U, CV_8U );
 
     canny_edges.release();
     mask.release();
     borders.release();
-    return distance;
+    distance.release();
+    markers.release();
+    return markers_8U;
 }
 
 

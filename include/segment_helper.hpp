@@ -14,5 +14,6 @@ int wait_key();
 cv::Mat distance_finder(cv::Mat borders);
 cv::Mat make_background_mask(cv::Mat image);
 cv::Mat create_bordered_map(cv::Mat canny_edges, cv::Mat mask);
+cv::Mat draw_markers(cv::Mat distance_transform);
 
 #endif
