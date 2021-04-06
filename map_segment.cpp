@@ -81,11 +81,7 @@ segment(MapData* map_data, bool grayscale, int hsv_plane = 2)
         {
             int pixel = map_data->markers->at<int>( i, j );
             if (pixel > 0 && pixel <= static_cast<int>(map_data->contours->size())) {
-                result.at<cv::Vec3b>( i, j ) = cv::Vec3b(
-            (uchar) cv::theRNG().uniform(0, 256),
-            (uchar) cv::theRNG().uniform(0, 256),
-            (uchar) cv::theRNG().uniform(0, 256)
-        );//colors[ pixel -1 ];
+                result.at<cv::Vec3b>( i, j ) = *map_data->whole_map->at<cv::Vec3b>( i, j );
             }
         }
     }
