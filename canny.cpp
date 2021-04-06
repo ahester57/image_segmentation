@@ -30,7 +30,7 @@ draw_canny_contours(cv::Mat image)
     // draw the contours
     cv::Mat canvas = cv::Mat::zeros( canny_output.size(), CV_8U );
     for (size_t i = 0; i < contours.size(); i++) {
-        cv::drawContours( canvas, contours, i, cv::Scalar(255), 2, cv::LINE_8, hierarchy, 0 );
+        cv::drawContours( canvas, contours, i, cv::Scalar(255), 1, cv::LINE_8, hierarchy, 0 );
     }
 
     // cv::imshow(" Canny Output Image", canvas );
@@ -46,7 +46,7 @@ draw_canny_contours(cv::Mat image)
  * 
 **/
 cv::Mat
-draw_color_canny_contours(cv::Mat image, int plane)
+draw_color_canny_contours(cv::Mat image, int hsv_plane)
 {
     // Convert to HSV
     cv::Mat hsv_image;
@@ -57,7 +57,7 @@ draw_color_canny_contours(cv::Mat image, int plane)
     cv::split( hsv_image, hsv_planes );
 
     // canny edge detection, returning contour map
-    cv::Mat canny_edges = draw_canny_contours( hsv_planes[plane] );
+    cv::Mat canny_edges = draw_canny_contours( hsv_planes[hsv_plane] );
 
     hsv_planes[0].release();
     hsv_planes[1].release();

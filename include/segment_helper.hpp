@@ -27,8 +27,8 @@ cv::Mat make_background_mask(cv::Mat image);
 
 cv::Mat create_bordered_map(cv::Mat canny_edges, cv::Mat mask);
 
-std::vector<std::vector<cv::Point>>* find_contours(cv::Mat distance_transform);
+std::vector<std::vector<cv::Point>>* find_distance_contours(cv::Mat distance_transform);
 
-cv::Mat* draw_markers(std::vector<std::vector<cv::Point>> contours, cv::Size canvas_size);
+cv::Mat* draw_contours_as_markers(std::vector<std::vector<cv::Point>> contours, cv::Size canvas_size);
 
 #endif

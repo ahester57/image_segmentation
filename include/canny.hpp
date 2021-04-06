@@ -8,6 +8,6 @@
 #include <opencv2/core/core.hpp>
 
 cv::Mat draw_canny_contours(cv::Mat image);
-cv::Mat draw_color_canny_contours(cv::Mat image, int plane);
+cv::Mat draw_color_canny_contours(cv::Mat image, int hsv_plane);
 
 #endif

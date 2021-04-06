@@ -32,11 +32,12 @@ segment(MapData* map_data, int hsv_plane)
     // create mask, only distance filter on foreground
     //TODO make this better at background detection, not just black backgrounds
     cv::Mat mask = make_background_mask( *map_data->whole_map );
+//TODO return a pointer and save to map_data
 
     // canny edge detection, returning contour map
-    cv::Mat canny_edges = draw_color_canny_contours( *map_data->whole_map, hsv_plane ); // for usa.png, saturation is best to use
+    cv::Mat canny_edges = draw_color_canny_contours( *map_data->whole_map, hsv_plane ); // for usa.png, saturation is best to use imo
 
-    // create bordered map
+    // // create bordered map
     cv::Mat borders = create_bordered_map( canny_edges, mask );
     canny_edges.release();
 
@@ -44,10 +45,10 @@ segment(MapData* map_data, int hsv_plane)
     cv::Mat distance = distance_finder( borders );
     borders.release();
 
-    map_data->contours = find_contours( distance );
+    map_data->contours = find_distance_contours( distance );
 
     // create markers for foreground objects // aka "markers"
-    map_data->markers = draw_markers( *map_data->contours, distance.size() );
+    map_data->markers = draw_contours_as_markers( *map_data->contours, distance.size() );
     distance.release();
 
     // apply watershed algorithm

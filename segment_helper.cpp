@@ -60,7 +60,7 @@ create_bordered_map(cv::Mat canny_edges, cv::Mat mask)
 
 
 std::vector<std::vector<cv::Point>>*
-find_contours(cv::Mat distance_transform)
+find_distance_contours(cv::Mat distance_transform)
 {
     cv::threshold( distance_transform, distance_transform, 0.1f, 1.f, cv::THRESH_BINARY );
 
@@ -75,7 +75,7 @@ find_contours(cv::Mat distance_transform)
 }
 
 cv::Mat*
-draw_markers(std::vector<std::vector<cv::Point>> contours, cv::Size canvas_size)
+draw_contours_as_markers(std::vector<std::vector<cv::Point>> contours, cv::Size canvas_size)
 {
     cv::Mat* markers_pt = new cv::Mat();
     *markers_pt = cv::Mat::zeros( canvas_size, CV_32S );
