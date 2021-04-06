@@ -8,10 +8,14 @@
 
 #include <opencv2/core/core.hpp>
 
-#include <vector>
-#include <iostream>
 
-std::vector<std::string> split (std::string s, char delim);
-std::string cv_type_to_str(cv::Mat img);
+typedef struct {
+    const std::string* window_name;
+    cv::Mat* whole_map;
+    cv::Mat* region_of_interest;
+} MapData;
+
+void mouse_callback_draw_zeros(int event, int x, int y, int d, void* userdata);
+void init_callback(MapData* frequency_mask);
 
 #endif

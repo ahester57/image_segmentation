@@ -13,13 +13,14 @@
 void
 mouse_callback_draw_zeros(int event, int x, int y, int d, void* userdata)
 {
-    cv::Mat* frequency_mask = (cv::Mat*) userdata;
+    MapData* map_data = (MapData*) userdata;
 
     switch (event) {
         case cv::EVENT_LBUTTONUP:
             // push the new point
             // draw a circle mask at chosen points
-            cv::circle( *frequency_mask, cv::Point2f( x, y ), 4, cv::Scalar(0), cv::FILLED );
+            cv::circle( *map_data->whole_map, cv::Point2f( x, y ), 4, cv::Scalar(0), cv::FILLED );
+            cv::imshow( *map_data->window_name, *map_data->whole_map );
             break;
     }
 }
@@ -27,7 +28,7 @@ mouse_callback_draw_zeros(int event, int x, int y, int d, void* userdata)
 
 // assign mouse callbacks
 void
-init_callback(std::string window_name, cv::Mat* frequency_mask)
+init_callback(MapData* map_data)
 {
-    cv::setMouseCallback( window_name, mouse_callback_draw_zeros, frequency_mask );
+    cv::setMouseCallback( *map_data->window_name, mouse_callback_draw_zeros, map_data );
 }
