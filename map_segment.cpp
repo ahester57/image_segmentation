@@ -101,6 +101,7 @@ main(int argc, const char** argv)
     bool blur_output;
     bool equalize_output;
     int hsv_plane;
+    bool grayscale = false;
 
     // parse and save command line args
     int parse_result = parse_arguments(
@@ -114,7 +115,7 @@ main(int argc, const char** argv)
     );
     if (parse_result != 1) return parse_result;
 
-    cv::Mat input_image = open_image( input_image_filename );
+    cv::Mat input_image = open_image( input_image_filename, grayscale );
 
     // crop if odd resolution
     input_image = input_image(
@@ -127,6 +128,7 @@ main(int argc, const char** argv)
     }
 
     cv::imshow( WINDOW_NAME, input_image );
+
 
     // initialize the mouse callback
     MapData map_data = { &WINDOW_NAME, &input_image, &input_image };
@@ -145,7 +147,7 @@ main(int argc, const char** argv)
 
     // equalize the output if given 'e' flag
     if (equalize_output) {
-        cv::equalizeHist( output_image, output_image );
+        equalize_image( &output_image, grayscale );
     }
 
     cv::imshow( WINDOW_NAME + " Output Image", output_image );

@@ -9,6 +9,7 @@
 #include <iostream>
 #include <vector>
 
+#include "./include/hsv_convert.hpp"
 #include "./include/segment_helper.hpp"
 
 
@@ -23,6 +24,23 @@ wait_key()
         return 0;
     }
     return 1;
+}
+
+
+void
+equalize_image(cv::Mat* image, bool grayscale)
+{
+    if (grayscale) {
+        cv::equalizeHist( *image, *image );
+    } else {
+        cv::Mat hsv_image;
+        bgr_to_hsv( *image, &hsv_image );
+        cv::Mat hsv_planes[3];
+        cv::split( hsv_image, hsv_planes );
+        cv::equalizeHist( hsv_planes[2], hsv_planes[2] );
+        cv::merge( hsv_planes, 3, hsv_image );
+        hsv_to_bgr( hsv_image, image );
+    }
 }
 
 

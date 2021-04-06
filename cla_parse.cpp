@@ -24,8 +24,8 @@ parse_arguments(
         "{@input_image    |<none>| Input Image}"
         "{@output_image   |<none>| Output Image}"
         "{scale s         |1.f   | Scale Input Image Size}"
-        "{blur b          |      | Blur Output Image}"
         "{equalize e      |      | Equalize Output Image}"
+        "{blur b          |      | Blur Output Image}"
         "{hsv_plane p     |2     | HSV Plane to Use: 0 = H, 1 = S, 2 = V}"
         "{help h          |      | Show Help Message}";
 
@@ -86,7 +86,7 @@ parse_arguments(
         *hsv_plane = (float) parser.get<int>("p");
         assert( *hsv_plane >= 0 && *hsv_plane <= 2 );
     } catch (...) {
-        std::cerr << "Failed to parse scale argument!:" << std::endl;
+        std::cerr << "Failed to parse hsv_plane argument!:" << std::endl;
         return -1;
     }
 

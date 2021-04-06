@@ -21,6 +21,8 @@ typedef struct {
 
 int wait_key();
 
+void equalize_image(cv::Mat* image, bool grayscale);
+
 cv::Mat distance_finder(cv::Mat borders);
 
 cv::Mat make_background_mask(cv::Mat image);
