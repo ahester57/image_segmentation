@@ -6,6 +6,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
+#include "./include/dir_func.hpp"
 #include "./include/mouse_callback.hpp"
 #include "./include/segment_helper.hpp"
 
@@ -18,13 +19,11 @@ mouse_callback_draw_zeros(int event, int x, int y, int d, void* userdata)
 
     switch (event) {
         case cv::EVENT_LBUTTONUP:
-            // push the new point
-            // draw a circle mask at chosen points
-            // cv::circle( *map_data->whole_map, cv::Point2f( x, y ), 4, cv::Scalar(0), cv::FILLED );
             // find the marker at that point
             int marker_value = map_data->markers->at<int>( y, x );
             expand_selected_region( map_data, marker_value );
             cv::imshow( *map_data->window_name, *map_data->region_of_interest );
+            write_img_to_file( *map_data->region_of_interest, "./out", "/regions/out_" + std::to_string(marker_value) + ".png" );
             break;
     }
 }
