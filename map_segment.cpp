@@ -24,7 +24,7 @@ const std::string WINDOW_NAME = "Map Segmentation";
 std::string output_image_filename;
 
 
-cv::Mat
+void
 segment(MapData* map_data, bool grayscale, int hsv_plane = 2)
 {
     cv::Size input_image_size = map_data->whole_map->size();
@@ -60,7 +60,8 @@ segment(MapData* map_data, bool grayscale, int hsv_plane = 2)
     cv::imshow( "Markers 8U", markers_8U );
     markers_8U.release();
 
-    cv::Mat result = cv::Mat::zeros( map_data->markers->size(), CV_8UC3 );
+    map_data->marked_up_image = new cv::Mat();
+    *map_data->marked_up_image = cv::Mat::zeros( map_data->markers->size(), CV_8UC3 );
 
     // fill in states
     for (int i = 0; i < map_data->markers->rows; i++)
@@ -69,12 +70,11 @@ segment(MapData* map_data, bool grayscale, int hsv_plane = 2)
         {
             int pixel = map_data->markers->at<int>( i, j );
             if (pixel > 0 && pixel <= static_cast<int>(map_data->contours->size())) {
-                result.at<cv::Vec3b>( i, j ) = map_data->whole_map->at<cv::Vec3b>( i, j );
+                map_data->marked_up_image->at<cv::Vec3b>( i, j ) = map_data->whole_map->at<cv::Vec3b>( i, j );
             }
         }
     }
 
-    return result;
 }
 
 
@@ -126,22 +126,21 @@ main(int argc, const char** argv)
     MapData map_data = { NULL, &input_image, NULL, &input_image, NULL, NULL };
 
     // segment the image
-    cv::Mat output_image = segment( &map_data, grayscale, hsv_plane );
-    map_data.marked_up_image = &output_image;
+    segment( &map_data, grayscale, hsv_plane );
 
     // blur the output if given 'b' flag
     if (blur_output) {
-        cv::medianBlur( output_image, output_image, 3 );
+        cv::medianBlur( *map_data.marked_up_image, *map_data.marked_up_image, 3 );
     }
 
     // equalize the output if given 'e' flag
     if (equalize_output) {
-        equalize_image( &output_image, grayscale );
+        equalize_image( map_data.marked_up_image, grayscale );
     }
 
     std::string output_window_name = WINDOW_NAME + " Output Image";
-    cv::imshow( output_window_name, output_image );
-    write_img_to_file( output_image, "./out", output_image_filename );
+    cv::imshow( output_window_name, *map_data.marked_up_image );
+    write_img_to_file( *map_data.marked_up_image, "./out", output_image_filename );
 
     // initialize the mouse callback
     map_data.window_name = &output_window_name;
@@ -157,9 +156,9 @@ main(int argc, const char** argv)
     delete map_data.markers;
     delete map_data.map_mask;
     delete map_data.region_of_interest;
+    delete map_data.marked_up_image;
 
     input_image.release();
-    output_image.release();
 
     return 0;
 }

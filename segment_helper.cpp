@@ -30,9 +30,7 @@ wait_key()
 void
 expand_selected_region(MapData* map_data, int marker_value)
 {
-    // delete map_data->region_of_interest;
-    map_data->region_of_interest = new cv::Mat();
-
+    *map_data->region_of_interest = cv::Mat::zeros( map_data->whole_map->size(), map_data->whole_map->type() );
         // fill in states
     for (int i = 0; i < map_data->markers->rows; i++)
     {
@@ -46,6 +44,7 @@ expand_selected_region(MapData* map_data, int marker_value)
             }
         }
     }
+
 }
 
 
