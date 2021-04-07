@@ -23,7 +23,7 @@ typedef struct {
 
 int wait_key();
 
-void expand_selected_region(MapData* map_data, int marker_value);
+void higlight_selected_region(MapData* map_data, int marker_value);
 
 void equalize_image(cv::Mat* image, bool grayscale);
 

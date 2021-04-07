@@ -21,7 +21,6 @@
 
 const std::string WINDOW_NAME = "Map Segmentation";
 
-std::string output_image_filename;
 
 
 void
@@ -83,6 +82,7 @@ main(int argc, const char** argv)
 {
     // CLA variables
     std::string input_image_filename;
+    std::string output_image_filename;
     // CLA flags
     float scale_image_value;
     bool blur_output;

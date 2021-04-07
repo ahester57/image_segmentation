@@ -21,9 +21,9 @@ mouse_callback_draw_zeros(int event, int x, int y, int d, void* userdata)
         case cv::EVENT_LBUTTONUP:
             // find the marker at that point
             int marker_value = map_data->markers->at<int>( y, x );
-            expand_selected_region( map_data, marker_value );
+            higlight_selected_region( map_data, marker_value );
             cv::imshow( *map_data->window_name, *map_data->region_of_interest );
-            write_img_to_file( *map_data->region_of_interest, "./out", "/regions/out_" + std::to_string(marker_value) + ".png" );
+            write_img_to_file( *map_data->region_of_interest, "./out", "regions/out_" + std::to_string(marker_value) + ".png" );
             break;
     }
 }

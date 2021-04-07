@@ -28,23 +28,30 @@ wait_key()
 
 
 void
-expand_selected_region(MapData* map_data, int marker_value)
+higlight_selected_region(MapData* map_data, int marker_value)
 {
     *map_data->region_of_interest = cv::Mat::zeros( map_data->whole_map->size(), map_data->whole_map->type() );
         // fill in states
+    cv::Mat mask_8u;
+    map_data->map_mask->convertTo( mask_8u, CV_8U );
+    cv::imshow( "mask?", ~mask_8u );
+
     for (int i = 0; i < map_data->markers->rows; i++)
     {
         for (int j = 0; j < map_data->markers->cols; j++)
         {
+            if (mask_8u.at<uchar>( i, j ) != (uchar) 0) {
+                continue;
+            }
             int pixel = map_data->markers->at<int>( i, j );
-            if (pixel == marker_value) {
+            if (pixel > 0 && pixel == marker_value) {
                 map_data->region_of_interest->at<cv::Vec3b>( i, j ) = cv::Vec3b(255, 255, 150);//map_data->marked_up_image->at<cv::Vec3b>( i, j );
             } else {
                 map_data->region_of_interest->at<cv::Vec3b>( i, j ) = map_data->marked_up_image->at<cv::Vec3b>( i, j );
             }
         }
     }
-
+    mask_8u.release();
 }
 
 
