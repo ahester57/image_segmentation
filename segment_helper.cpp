@@ -27,6 +27,14 @@ wait_key()
 }
 
 
+cv::Mat
+expand_selected_region(MapData* map_data)
+{
+    // map_data
+    return *map_data->map_mask;
+}
+
+
 void
 equalize_image(cv::Mat* image, bool grayscale)
 {
@@ -54,11 +62,11 @@ distance_finder(cv::Mat borders)
 }
 
 // Trivial "black background only" background finder
-cv::Mat
+cv::Mat*
 make_background_mask(cv::Mat image)
 {
-    cv::Mat mask;
-    cv::inRange( image, cv::Scalar::all(0), cv::Scalar::all(0), mask );
+    cv::Mat* mask = new cv::Mat();
+    cv::inRange( image, cv::Scalar::all(0), cv::Scalar::all(0), *mask );
     return mask;
 }
 
@@ -80,7 +88,7 @@ create_bordered_map(cv::Mat canny_edges, cv::Mat mask)
 std::vector<std::vector<cv::Point>>*
 find_distance_contours(cv::Mat distance_transform)
 {
-    cv::threshold( distance_transform, distance_transform, 0.1f, 1.f, cv::THRESH_BINARY );
+    cv::threshold( distance_transform, distance_transform, 0.01f, 1.f, cv::THRESH_BINARY );
 
     cv::Mat distance_8U;
     distance_transform.convertTo( distance_8U, CV_8U );

@@ -13,6 +13,7 @@
 typedef struct {
     const std::string* window_name;
     cv::Mat* whole_map;
+    cv::Mat* map_mask;
     cv::Mat* region_of_interest;
     std::vector<std::vector<cv::Point>>* contours;
     cv::Mat* markers;
@@ -21,11 +22,13 @@ typedef struct {
 
 int wait_key();
 
+cv::Mat expand_selected_region(MapData* map_data);
+
 void equalize_image(cv::Mat* image, bool grayscale);
 
 cv::Mat distance_finder(cv::Mat borders);
 
-cv::Mat make_background_mask(cv::Mat image);
+cv::Mat* make_background_mask(cv::Mat image);
 
 cv::Mat create_bordered_map(cv::Mat canny_edges, cv::Mat mask);
 

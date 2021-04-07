@@ -31,15 +31,14 @@ segment(MapData* map_data, bool grayscale, int hsv_plane = 2)
 
     // create mask, only distance filter on foreground
     //TODO make this better at background detection, not just black backgrounds
-    cv::Mat mask = make_background_mask( *map_data->whole_map );
-//TODO return a pointer and save to map_data
+    map_data->map_mask = make_background_mask( *map_data->whole_map );
 
     // canny edge detection, returning contour map
     cv::Mat canny_edges = grayscale ? draw_canny_contours( *map_data->whole_map )
                                     : draw_color_canny_contours( *map_data->whole_map, hsv_plane ); // for usa.png, saturation is best to use imo
 
     // // create bordered map
-    cv::Mat borders = create_bordered_map( canny_edges, mask );
+    cv::Mat borders = create_bordered_map( canny_edges, *map_data->map_mask );
     canny_edges.release();
 
     // distance transform on thresholded
@@ -56,8 +55,8 @@ segment(MapData* map_data, bool grayscale, int hsv_plane = 2)
     cv::watershed( *map_data->whole_map, *map_data->markers );
 
     cv::Mat markers_8U;
-    map_data->markers->convertTo( markers_8U, CV_8U, 3 );
-    cv::bitwise_and( markers_8U, ~mask, markers_8U );
+    map_data->markers->convertTo( markers_8U, CV_8U );
+    cv::bitwise_and( markers_8U, ~*map_data->map_mask, markers_8U );
     cv::imshow( "Markers 8U", markers_8U );
     markers_8U.release();
 
@@ -75,7 +74,6 @@ segment(MapData* map_data, bool grayscale, int hsv_plane = 2)
         }
     }
 
-    mask.release();
     return result;
 }
 
@@ -149,10 +147,9 @@ main(int argc, const char** argv)
 
     cv::destroyAllWindows();
 
-    map_data.region_of_interest->release();
-    map_data.markers->release();
     delete map_data.contours;
     delete map_data.markers;
+    delete map_data.map_mask;
 
     input_image.release();
     output_image.release();

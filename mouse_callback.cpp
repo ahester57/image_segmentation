@@ -20,6 +20,8 @@ mouse_callback_draw_zeros(int event, int x, int y, int d, void* userdata)
             // push the new point
             // draw a circle mask at chosen points
             cv::circle( *map_data->whole_map, cv::Point2f( x, y ), 4, cv::Scalar(0), cv::FILLED );
+            // find the marker at that point
+            // cv::
             cv::imshow( *map_data->window_name, *map_data->whole_map );
             break;
     }
