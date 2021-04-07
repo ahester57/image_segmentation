@@ -28,15 +28,11 @@ segment(MapData* map_data, bool grayscale, int hsv_plane = 2)
 {
     cv::Size input_image_size = map_data->whole_map->size();
 
-    // create mask, only distance filter on foreground
-    //TODO make this better at background detection, not just black backgrounds
-    map_data->map_mask = make_background_mask( *map_data->whole_map );
-
     // canny edge detection, returning contour map
     cv::Mat canny_edges = grayscale ? draw_canny_contours( *map_data->whole_map )
                                     : draw_color_canny_contours( *map_data->whole_map, hsv_plane ); // for usa.png, saturation is best to use imo
 
-    // // create bordered map
+    // create bordered map
     cv::Mat borders = create_bordered_map( canny_edges, *map_data->map_mask );
     canny_edges.release();
 
@@ -53,13 +49,15 @@ segment(MapData* map_data, bool grayscale, int hsv_plane = 2)
     // apply watershed algorithm
     cv::watershed( *map_data->whole_map, *map_data->markers );
 
+#if DEBUG
     cv::Mat markers_8U;
     map_data->markers->convertTo( markers_8U, CV_8U );
     cv::bitwise_and( markers_8U, ~*map_data->map_mask, markers_8U );
     cv::imshow( "Markers 8U", markers_8U );
     markers_8U.release();
+#endif
 
-    map_data->marked_up_image = new cv::Mat();
+    // create new marked_up_image (the one we click on)
     *map_data->marked_up_image = cv::Mat::zeros( map_data->markers->size(), CV_8UC3 );
 
     // fill in states
@@ -115,18 +113,24 @@ main(int argc, const char** argv)
         input_image = resize_affine( input_image, scale_image_value );
     }
 
+#if DEBUG
     cv::imshow( WINDOW_NAME, input_image );
-
-
-
-
     // 'event loop' for keypresses
     while (wait_key());
+#endif
 
-    MapData map_data = { NULL, &input_image, NULL, &input_image, NULL, NULL };
+    MapData map_data = { NULL, &input_image, NULL, &input_image, NULL, NULL, new cv::Mat() };
 
-    // segment the image
-    segment( &map_data, grayscale, hsv_plane );
+    // create mask, only distance filter on foreground
+    //TODO make this better at background detection, not just black backgrounds
+    map_data.map_mask = make_background_mask( *map_data.whole_map );
+
+    // segment the image by intensity
+    segment( &map_data, grayscale, 2 );
+    // again by saturation, replacing the input with output from above
+    *map_data.whole_map = cv::Mat::zeros(map_data.whole_map->size(), map_data.whole_map->type());
+    map_data.marked_up_image->copyTo( *map_data.whole_map );
+    segment( &map_data, grayscale, 1 );
 
     // blur the output if given 'b' flag
     if (blur_output) {
