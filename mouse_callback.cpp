@@ -7,6 +7,7 @@
 #include <opencv2/highgui/highgui.hpp>
 
 #include "./include/mouse_callback.hpp"
+#include "./include/segment_helper.hpp"
 
 
 // draw zeros on image
@@ -19,10 +20,11 @@ mouse_callback_draw_zeros(int event, int x, int y, int d, void* userdata)
         case cv::EVENT_LBUTTONUP:
             // push the new point
             // draw a circle mask at chosen points
-            cv::circle( *map_data->whole_map, cv::Point2f( x, y ), 4, cv::Scalar(0), cv::FILLED );
+            // cv::circle( *map_data->whole_map, cv::Point2f( x, y ), 4, cv::Scalar(0), cv::FILLED );
             // find the marker at that point
-            // cv::
-            cv::imshow( *map_data->window_name, *map_data->whole_map );
+            int marker_value = map_data->markers->at<int>( y, x );
+            expand_selected_region( map_data, marker_value );
+            cv::imshow( *map_data->window_name, *map_data->region_of_interest );
             break;
     }
 }

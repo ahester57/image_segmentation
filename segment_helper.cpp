@@ -27,11 +27,25 @@ wait_key()
 }
 
 
-cv::Mat
-expand_selected_region(MapData* map_data)
+void
+expand_selected_region(MapData* map_data, int marker_value)
 {
-    // map_data
-    return *map_data->map_mask;
+    // delete map_data->region_of_interest;
+    map_data->region_of_interest = new cv::Mat();
+
+        // fill in states
+    for (int i = 0; i < map_data->markers->rows; i++)
+    {
+        for (int j = 0; j < map_data->markers->cols; j++)
+        {
+            int pixel = map_data->markers->at<int>( i, j );
+            if (pixel == marker_value) {
+                map_data->region_of_interest->at<cv::Vec3b>( i, j ) = cv::Vec3b(255, 255, 150);//map_data->marked_up_image->at<cv::Vec3b>( i, j );
+            } else {
+                map_data->region_of_interest->at<cv::Vec3b>( i, j ) = map_data->marked_up_image->at<cv::Vec3b>( i, j );
+            }
+        }
+    }
 }
 
 

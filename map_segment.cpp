@@ -118,15 +118,16 @@ main(int argc, const char** argv)
     cv::imshow( WINDOW_NAME, input_image );
 
 
-    // initialize the mouse callback
-    MapData map_data = { &WINDOW_NAME, &input_image, &input_image };
-    init_callback( &map_data );
+
 
     // 'event loop' for keypresses
     while (wait_key());
 
+    MapData map_data = { NULL, &input_image, NULL, &input_image, NULL, NULL };
+
     // segment the image
     cv::Mat output_image = segment( &map_data, grayscale, hsv_plane );
+    map_data.marked_up_image = &output_image;
 
     // blur the output if given 'b' flag
     if (blur_output) {
@@ -138,8 +139,13 @@ main(int argc, const char** argv)
         equalize_image( &output_image, grayscale );
     }
 
-    cv::imshow( WINDOW_NAME + " Output Image", output_image );
+    std::string output_window_name = WINDOW_NAME + " Output Image";
+    cv::imshow( output_window_name, output_image );
     write_img_to_file( output_image, "./out", output_image_filename );
+
+    // initialize the mouse callback
+    map_data.window_name = &output_window_name;
+    init_callback( &map_data );
 
     // 'event loop' for keypresses
     while (wait_key());
@@ -150,6 +156,7 @@ main(int argc, const char** argv)
     delete map_data.contours;
     delete map_data.markers;
     delete map_data.map_mask;
+    delete map_data.region_of_interest;
 
     input_image.release();
     output_image.release();

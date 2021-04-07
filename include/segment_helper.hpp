@@ -17,12 +17,13 @@ typedef struct {
     cv::Mat* region_of_interest;
     std::vector<std::vector<cv::Point>>* contours;
     cv::Mat* markers;
+    cv::Mat* marked_up_image;
 } MapData;
 
 
 int wait_key();
 
-cv::Mat expand_selected_region(MapData* map_data);
+void expand_selected_region(MapData* map_data, int marker_value);
 
 void equalize_image(cv::Mat* image, bool grayscale);
 
