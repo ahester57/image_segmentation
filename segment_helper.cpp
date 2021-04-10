@@ -56,6 +56,7 @@ higlight_selected_region(MapData* map_data, int marker_value)
             }
         }
     }
+    cv::rectangle( *map_data->region_of_interest, (*map_data->boundaries)[marker_value], cv::Scalar::all(255), 2 );
     mask_8u.release();
 }
 
@@ -136,4 +137,19 @@ draw_contours_as_markers(std::vector<std::vector<cv::Point>> contours, cv::Size 
     }
 
     return markers_pt;
+}
+
+std::vector<cv::Rect>*
+draw_bounding_rects(std::vector<std::vector<cv::Point>> contours)
+{
+    std::vector<cv::Rect>* boundaries = new std::vector<cv::Rect>;
+    *boundaries = std::vector<cv::Rect>( contours.size() );
+    for (size_t i = 0; i < contours.size(); i++) {
+        int ii = static_cast<int>( i );
+        std::vector<cv::Point> contours_poly;
+        cv::approxPolyDP( contours[ii], contours_poly, 3, true );
+        (*boundaries)[ii] = cv::boundingRect( contours_poly );
+    }
+
+    return boundaries;
 }

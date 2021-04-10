@@ -40,7 +40,11 @@ segment(MapData* map_data, bool grayscale, int hsv_plane = 2)
     cv::Mat distance = distance_finder( borders );
     borders.release();
 
+    // find contours of distance transform
     map_data->contours = find_distance_contours( distance );
+
+    // find boundaries of the contours
+    map_data->boundaries = draw_bounding_rects( *map_data->contours );
 
     // create markers for foreground objects // aka "markers"
     map_data->markers = draw_contours_as_markers( *map_data->contours, distance.size() );
@@ -119,7 +123,7 @@ main(int argc, const char** argv)
     while (wait_key());
 #endif
 
-    MapData map_data = { NULL, &input_image, NULL, &input_image, NULL, NULL, new cv::Mat() };
+    MapData map_data = { NULL, &input_image, NULL, &input_image, NULL, NULL, NULL, new cv::Mat() };
 
     // create mask, only distance filter on foreground
     //TODO make this better at background detection, not just black backgrounds
@@ -161,6 +165,7 @@ main(int argc, const char** argv)
     delete map_data.map_mask;
     delete map_data.region_of_interest;
     delete map_data.marked_up_image;
+    delete map_data.boundaries;
 
     input_image.release();
 

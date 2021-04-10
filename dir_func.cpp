@@ -27,6 +27,7 @@ open_image(std::string file_path, bool grayscale)
 
         assert(!dst.empty());
 
+        std::cout << "Image type is:\t\t\t" << cv_type_to_str( dst ) << std::endl;
         std::cout << "Image size is:\t\t\t" << dst.cols << "x" << dst.rows << std::endl;
     } catch (std::string &str) {
         std::cerr << "Error: " << file_path << ": " << str << std::endl;
