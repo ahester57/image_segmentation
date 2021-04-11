@@ -9,6 +9,7 @@
 #include <iostream>
 #include <vector>
 
+#include "./include/affine.hpp"
 #include "./include/hsv_convert.hpp"
 #include "./include/segment_helper.hpp"
 
@@ -60,8 +61,11 @@ higlight_selected_region(MapData* map_data, int marker_value)
     cv::rectangle( *map_data->region_of_interest, (*map_data->boundaries)[marker_value - 1], cv::Scalar::all(255), 2 );
 
     // draw the region seperately
-    cv::Mat* tmp_image = draw_contour_as_marker( *map_data->contours, map_data->region_of_interest->size(), marker_value );
-    cv::imshow( "tmp_image", *tmp_image );
+    cv::Mat tmp_image = draw_contour_as_marker( *map_data->contours, map_data->region_of_interest->size(), marker_value );
+    tmp_image = tmp_image( (*map_data->boundaries)[marker_value - 1] );
+    // double the size
+    tmp_image = resize_affine( tmp_image, 2.f );
+    cv::imshow( "tmp_image", tmp_image );
     // wait_key();
 
     mask_8u.release();
@@ -134,13 +138,12 @@ find_distance_contours(cv::Mat distance_transform)
 }
 
 
-cv::Mat*
+cv::Mat
 draw_contour_as_marker(std::vector<std::vector<cv::Point>> contours, cv::Size canvas_size, int marker_value)
 {
-    cv::Mat* marker_pt = new cv::Mat();
-    *marker_pt = cv::Mat::zeros( canvas_size, CV_8U );
-    cv::drawContours( *marker_pt, contours, marker_value - 1, cv::Scalar( marker_value ), -1 );
-    return marker_pt;
+    cv::Mat marker = cv::Mat::zeros( canvas_size, CV_8U );
+    cv::drawContours( marker, contours, marker_value - 1, cv::Scalar( 255 ), -1 );
+    return marker;
 }
 
 
