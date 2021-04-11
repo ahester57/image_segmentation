@@ -56,7 +56,14 @@ higlight_selected_region(MapData* map_data, int marker_value)
             }
         }
     }
+    // draw the bounding rect of the selected region
     cv::rectangle( *map_data->region_of_interest, (*map_data->boundaries)[marker_value - 1], cv::Scalar::all(255), 2 );
+
+    // draw the region seperately
+    cv::Mat* tmp_image = draw_contour_as_marker( *map_data->contours, map_data->region_of_interest->size(), marker_value );
+    cv::imshow( "tmp_image", *tmp_image );
+    // wait_key();
+
     mask_8u.release();
 }
 
@@ -126,6 +133,17 @@ find_distance_contours(cv::Mat distance_transform)
     return contours;
 }
 
+
+cv::Mat*
+draw_contour_as_marker(std::vector<std::vector<cv::Point>> contours, cv::Size canvas_size, int marker_value)
+{
+    cv::Mat* marker_pt = new cv::Mat();
+    *marker_pt = cv::Mat::zeros( canvas_size, CV_8U );
+    cv::drawContours( *marker_pt, contours, marker_value - 1, cv::Scalar( marker_value ), -1 );
+    return marker_pt;
+}
+
+
 cv::Mat*
 draw_contours_as_markers(std::vector<std::vector<cv::Point>> contours, cv::Size canvas_size)
 {
@@ -138,6 +156,7 @@ draw_contours_as_markers(std::vector<std::vector<cv::Point>> contours, cv::Size 
 
     return markers_pt;
 }
+
 
 std::vector<cv::Rect>*
 draw_bounding_rects(std::vector<std::vector<cv::Point>> contours)
