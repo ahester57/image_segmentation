@@ -56,7 +56,7 @@ higlight_selected_region(MapData* map_data, int marker_value)
             }
         }
     }
-    cv::rectangle( *map_data->region_of_interest, (*map_data->boundaries)[marker_value], cv::Scalar::all(255), 2 );
+    cv::rectangle( *map_data->region_of_interest, (*map_data->boundaries)[marker_value - 1], cv::Scalar::all(255), 2 );
     mask_8u.release();
 }
 
