@@ -61,14 +61,23 @@ higlight_selected_region(MapData* map_data, int marker_value)
     cv::rectangle( *map_data->region_of_interest, (*map_data->boundaries)[marker_value - 1], cv::Scalar::all(255), 2 );
 
     // draw the region seperately
+    cv::Mat region_only = extract_selected_region( map_data, marker_value );
+    cv::imshow( "region_only", region_only );
+    // wait_key();
+
+    mask_8u.release();
+    region_only.release();
+}
+
+
+cv::Mat
+extract_selected_region(MapData* map_data, int marker_value)
+{
     cv::Mat tmp_image = draw_contour_as_marker( *map_data->contours, map_data->region_of_interest->size(), marker_value );
     tmp_image = tmp_image( (*map_data->boundaries)[marker_value - 1] );
     // double the size
     tmp_image = resize_affine( tmp_image, 2.f );
-    cv::imshow( "tmp_image", tmp_image );
-    // wait_key();
-
-    mask_8u.release();
+    return tmp_image;
 }
 
 
