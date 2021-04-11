@@ -28,6 +28,8 @@ void higlight_selected_region(MapData* map_data, int marker_value);
 
 cv::Mat extract_selected_region(MapData* map_data, int marker_value);
 
+cv::Mat extract_roi_safe(cv::Mat image, cv::Rect rect);
+
 void equalize_image(cv::Mat* image, bool grayscale);
 
 cv::Mat distance_finder(cv::Mat borders);

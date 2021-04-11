@@ -74,11 +74,31 @@ higlight_selected_region(MapData* map_data, int marker_value)
 cv::Mat
 extract_selected_region(MapData* map_data, int marker_value)
 {
-    cv::Mat tmp_image = draw_contour_as_marker( *map_data->contours, map_data->region_of_interest->size(), marker_value );
-    tmp_image = tmp_image( (*map_data->boundaries)[marker_value - 1] );
+    // draw contours and get bounding rectangle
+    cv::Mat drawn_contour = draw_contour_as_marker( *map_data->contours, map_data->region_of_interest->size(), marker_value );
+    cv::Rect contour_bounds = (*map_data->boundaries)[marker_value - 1];
+
+    // grab the ROI
+    drawn_contour = extract_roi_safe( drawn_contour, contour_bounds );
+
     // double the size
-    tmp_image = resize_affine( tmp_image, 2.f );
-    return tmp_image;
+    drawn_contour = resize_affine( drawn_contour, 2.f );
+
+    return drawn_contour;
+}
+
+
+// extract ROI ignoring out of bounds
+cv::Mat
+extract_roi_safe(cv::Mat image, cv::Rect rect)
+{
+    // adjust contour_bounds to prevent out of bounds errors
+    cv::Rect image_rect = cv::Rect( {}, image.size() );
+    cv::Rect intersection = image_rect & rect;
+    cv::Rect inter_roi = intersection - image_rect.tl();
+
+    // grab the ROI
+    return image( inter_roi );
 }
 
 
