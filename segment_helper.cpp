@@ -70,6 +70,7 @@ higlight_selected_region(MapData* map_data, int marker_value)
 }
 
 
+// extract selected region from contours
 cv::Mat
 extract_selected_region(MapData* map_data, int marker_value)
 {
@@ -97,7 +98,7 @@ equalize_image(cv::Mat* image, bool grayscale)
     }
 }
 
-
+// find normalized distance transform of image
 cv::Mat
 distance_finder(cv::Mat borders)
 {
@@ -116,7 +117,7 @@ make_background_mask(cv::Mat image)
     return mask;
 }
 
-
+// created binary image of regions
 cv::Mat
 create_bordered_map(cv::Mat canny_edges, cv::Mat mask)
 {
@@ -130,7 +131,7 @@ create_bordered_map(cv::Mat canny_edges, cv::Mat mask)
     return canny_edges_8U;
 }
 
-
+// find drawable contours from distance transformation
 std::vector<std::vector<cv::Point>>*
 find_distance_contours(cv::Mat distance_transform)
 {
@@ -146,7 +147,7 @@ find_distance_contours(cv::Mat distance_transform)
     return contours;
 }
 
-
+// draw singular contour
 cv::Mat
 draw_contour_as_marker(std::vector<std::vector<cv::Point>> contours, cv::Size canvas_size, int marker_value)
 {
@@ -155,7 +156,7 @@ draw_contour_as_marker(std::vector<std::vector<cv::Point>> contours, cv::Size ca
     return marker;
 }
 
-
+// draw all contours
 cv::Mat*
 draw_contours_as_markers(std::vector<std::vector<cv::Point>> contours, cv::Size canvas_size)
 {
@@ -169,7 +170,7 @@ draw_contours_as_markers(std::vector<std::vector<cv::Point>> contours, cv::Size 
     return markers_pt;
 }
 
-
+// create auxillary array of bounding rectangles
 std::vector<cv::Rect>*
 draw_bounding_rects(std::vector<std::vector<cv::Point>> contours)
 {
@@ -180,6 +181,10 @@ draw_bounding_rects(std::vector<std::vector<cv::Point>> contours)
         std::vector<cv::Point> contours_poly;
         cv::approxPolyDP( contours[ii], contours_poly, 3, true );
         (*boundaries)[ii] = cv::boundingRect( contours_poly );
+        // bump up size of rects just a bit
+        (*boundaries)[ii].x -= 5;
+        (*boundaries)[ii].y -= 5;
+        (*boundaries)[ii] += cv::Size( 10, 10 );
     }
 
     return boundaries;
