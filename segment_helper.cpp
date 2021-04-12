@@ -93,11 +93,11 @@ draw_in_states(MapData* map_data)
     map_data->map_mask->convertTo( mask_8u, CV_8U );
 
     // fill in states
-    for (int i = 0; i < map_data->markers->rows; i++)
+    for (int i = 0; i < map_data->markers.rows; i++)
     {
-        for (int j = 0; j < map_data->markers->cols; j++)
+        for (int j = 0; j < map_data->markers.cols; j++)
         {
-            int pixel = map_data->markers->at<int>( i, j );
+            int pixel = map_data->markers.at<int>( i, j );
             if (pixel > 0 && pixel <= static_cast<int>(map_data->contours->size())) {
                 map_data->marked_up_image->at<cv::Vec3b>( i, j ) = map_data->whole_map->at<cv::Vec3b>( i, j );
             }
@@ -115,15 +115,15 @@ draw_in_roi(MapData* map_data, int marker_value)
     map_data->map_mask->convertTo( mask_8u, CV_8U );
 
     // fill in selected region with 255, 255, 150
-    for (int i = 0; i < map_data->markers->rows; i++)
+    for (int i = 0; i < map_data->markers.rows; i++)
     {
-        for (int j = 0; j < map_data->markers->cols; j++)
+        for (int j = 0; j < map_data->markers.cols; j++)
         {
             // skip if not in mask
             if (mask_8u.at<uchar>( i, j ) != (uchar) 0) {
                 continue;
             }
-            int pixel = map_data->markers->at<int>( i, j );
+            int pixel = map_data->markers.at<int>( i, j );
             if (pixel > 0 && pixel == marker_value) {
                 // paint selected region
                 map_data->marked_up_image->at<cv::Vec3b>( i, j ) = cv::Vec3b(255, 255, 150);
@@ -212,17 +212,16 @@ draw_contour_as_marker(std::vector<std::vector<cv::Point>> contours, cv::Size ca
 }
 
 // draw all contours
-cv::Mat*
+cv::Mat
 draw_contours_as_markers(std::vector<std::vector<cv::Point>> contours, cv::Size canvas_size)
 {
-    cv::Mat* markers_pt = new cv::Mat();
-    *markers_pt = cv::Mat::zeros( canvas_size, CV_32S );
+    cv::Mat markers = cv::Mat::zeros( canvas_size, CV_32S );
     for (size_t i = 0; i < contours.size(); i++) {
         int ii = static_cast<int>( i );
-        cv::drawContours( *markers_pt, contours, ii, cv::Scalar( i + 1 ), -1 );
+        cv::drawContours( markers, contours, ii, cv::Scalar( i + 1 ), -1 );
     }
 
-    return markers_pt;
+    return markers;
 }
 
 // create auxillary array of bounding rectangles

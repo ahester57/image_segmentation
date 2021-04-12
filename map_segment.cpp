@@ -51,18 +51,18 @@ segment(MapData* map_data, bool grayscale, int hsv_plane = 2)
     distance.release();
 
     // apply watershed algorithm
-    cv::watershed( *map_data->whole_map, *map_data->markers );
+    cv::watershed( *map_data->whole_map, map_data->markers );
 
 #if DEBUG
     cv::Mat markers_8U;
-    map_data->markers->convertTo( markers_8U, CV_8U );
+    map_data->markers.convertTo( markers_8U, CV_8U );
     cv::bitwise_and( markers_8U, ~*map_data->map_mask, markers_8U );
     cv::imshow( "Markers 8U", markers_8U );
     markers_8U.release();
 #endif
 
     // create new marked_up_image (the one we click on)
-    *map_data->marked_up_image = cv::Mat::zeros( map_data->markers->size(), CV_8UC3 );
+    *map_data->marked_up_image = cv::Mat::zeros( map_data->markers.size(), CV_8UC3 );
 
     // draw original map back on
     draw_in_states( map_data );
@@ -114,7 +114,7 @@ main(int argc, const char** argv)
     while (wait_key());
 #endif
 
-    MapData map_data = { NULL, &input_image, NULL, cv::Mat(), NULL, NULL, NULL, new cv::Mat() };
+    MapData map_data = { NULL, &input_image, NULL, cv::Mat(), NULL, NULL, cv::Mat(), new cv::Mat() };
 
     // create mask, only distance filter on foreground
     //TODO make this better at background detection, not just black backgrounds
@@ -152,7 +152,7 @@ main(int argc, const char** argv)
     cv::destroyAllWindows();
 
     delete map_data.contours;
-    delete map_data.markers;
+    // delete map_data.markers;
     delete map_data.map_mask;
     // delete map_data.region_of_interest;
     delete map_data.marked_up_image;
