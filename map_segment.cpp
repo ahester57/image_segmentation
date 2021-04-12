@@ -117,7 +117,7 @@ main(int argc, const char** argv)
     std::string output_window_name = WINDOW_NAME + " Output Image";
 
     MapData map_data = {
-        &output_window_name,                        // window_name
+        output_window_name,                         // window_name
         &input_image,                               // whole_map
         NULL,                                       // map_mask
         cv::Mat(),                                  // region_of_interest
@@ -148,11 +148,10 @@ main(int argc, const char** argv)
         equalize_image( &map_data.marked_up_image );
     }
 
-    cv::imshow( *map_data.window_name, map_data.marked_up_image );
+    cv::imshow( map_data.window_name, map_data.marked_up_image );
     write_img_to_file( map_data.marked_up_image, "./out", output_image_filename );
 
     // initialize the mouse callback
-    map_data.window_name = &output_window_name;
     init_callback( &map_data );
 
     // 'event loop' for keypresses

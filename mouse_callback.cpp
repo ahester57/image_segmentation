@@ -22,8 +22,14 @@ mouse_callback_draw_zeros(int event, int x, int y, int d, void* userdata)
             // find the marker at that point
             int marker_value = map_data->markers.at<int>( y, x );
             higlight_selected_region( map_data, marker_value );
-            cv::imshow( *map_data->window_name, map_data->marked_up_image );
-            write_img_to_file( map_data->marked_up_image, "./out", "regions/out_" + std::to_string(marker_value) + ".png" );
+            // show marked_up_image
+            cv::imshow( map_data->window_name, map_data->marked_up_image );
+            // save marked_up_image
+            write_img_to_file(
+                map_data->marked_up_image,
+                "./out",
+                "regions/out_" + std::to_string(marker_value) + ".png"
+            );
             break;
     }
 }
@@ -33,5 +39,5 @@ mouse_callback_draw_zeros(int event, int x, int y, int d, void* userdata)
 void
 init_callback(MapData* map_data)
 {
-    cv::setMouseCallback( *map_data->window_name, mouse_callback_draw_zeros, map_data );
+    cv::setMouseCallback( map_data->window_name, mouse_callback_draw_zeros, map_data );
 }

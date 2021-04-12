@@ -11,7 +11,7 @@
 
 
 typedef struct {
-    const std::string* window_name;
+    const std::string window_name;
     cv::Mat* whole_map;
     cv::Mat* map_mask;
     cv::Mat region_of_interest;
