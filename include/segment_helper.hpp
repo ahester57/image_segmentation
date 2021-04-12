@@ -18,7 +18,7 @@ typedef struct {
     std::vector<std::vector<cv::Point>>* contours;
     std::vector<cv::Rect>* boundaries;
     cv::Mat markers;
-    cv::Mat* marked_up_image;
+    cv::Mat marked_up_image;
 } MapData;
 
 

@@ -33,14 +33,14 @@ higlight_selected_region(MapData* map_data, int marker_value)
 {
 
     // zero-out region of interest
-    *map_data->marked_up_image = cv::Mat::zeros( map_data->whole_map->size(), map_data->whole_map->type() );
+    map_data->marked_up_image = cv::Mat::zeros( map_data->whole_map->size(), map_data->whole_map->type() );
 
     // draw original map back on
     draw_in_states( map_data );
     // highlight selected region
     draw_in_roi( map_data, marker_value );
     // draw the bounding rect of the selected region
-    cv::rectangle( *map_data->marked_up_image, (*map_data->boundaries)[marker_value - 1], cv::Scalar::all(255), 2 );
+    cv::rectangle( map_data->marked_up_image, (*map_data->boundaries)[marker_value - 1], cv::Scalar::all(255), 2 );
 
     // draw the region seperately
     cv::Mat region_only = extract_selected_region( map_data, marker_value );
@@ -57,7 +57,7 @@ cv::Mat
 extract_selected_region(MapData* map_data, int marker_value)
 {
     // draw contours and get bounding rectangle
-    cv::Mat drawn_contour = draw_contour_as_marker( *map_data->contours, map_data->marked_up_image->size(), marker_value );
+    cv::Mat drawn_contour = draw_contour_as_marker( *map_data->contours, map_data->marked_up_image.size(), marker_value );
     cv::Rect contour_bounds = (*map_data->boundaries)[marker_value - 1];
 
     // grab the ROI
@@ -99,7 +99,7 @@ draw_in_states(MapData* map_data)
         {
             int pixel = map_data->markers.at<int>( i, j );
             if (pixel > 0 && pixel <= static_cast<int>(map_data->contours->size())) {
-                map_data->marked_up_image->at<cv::Vec3b>( i, j ) = map_data->whole_map->at<cv::Vec3b>( i, j );
+                map_data->marked_up_image.at<cv::Vec3b>( i, j ) = map_data->whole_map->at<cv::Vec3b>( i, j );
             }
         }
     }
@@ -126,7 +126,7 @@ draw_in_roi(MapData* map_data, int marker_value)
             int pixel = map_data->markers.at<int>( i, j );
             if (pixel > 0 && pixel == marker_value) {
                 // paint selected region
-                map_data->marked_up_image->at<cv::Vec3b>( i, j ) = cv::Vec3b(255, 255, 150);
+                map_data->marked_up_image.at<cv::Vec3b>( i, j ) = cv::Vec3b(255, 255, 150);
             }
         }
     }

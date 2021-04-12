@@ -62,7 +62,7 @@ segment(MapData* map_data, bool grayscale, int hsv_plane = 2)
 #endif
 
     // create new marked_up_image (the one we click on)
-    *map_data->marked_up_image = cv::Mat::zeros( map_data->markers.size(), CV_8UC3 );
+    map_data->marked_up_image = cv::Mat::zeros( map_data->markers.size(), CV_8UC3 );
 
     // draw original map back on
     draw_in_states( map_data );
@@ -114,7 +114,7 @@ main(int argc, const char** argv)
     while (wait_key());
 #endif
 
-    MapData map_data = { NULL, &input_image, NULL, cv::Mat(), NULL, NULL, cv::Mat(), new cv::Mat() };
+    MapData map_data = { NULL, &input_image, NULL, cv::Mat(), NULL, NULL, cv::Mat(), cv::Mat() };
 
     // create mask, only distance filter on foreground
     //TODO make this better at background detection, not just black backgrounds
@@ -124,22 +124,22 @@ main(int argc, const char** argv)
     segment( &map_data, grayscale, 2 );
     // again by saturation, replacing the input with output from above
     *map_data.whole_map = cv::Mat::zeros(map_data.whole_map->size(), map_data.whole_map->type());
-    map_data.marked_up_image->copyTo( *map_data.whole_map );
+    map_data.marked_up_image.copyTo( *map_data.whole_map );
     segment( &map_data, grayscale, 1 );
 
     // blur the output if given 'b' flag
     if (blur_output) {
-        cv::medianBlur( *map_data.marked_up_image, *map_data.marked_up_image, 3 );
+        cv::medianBlur( map_data.marked_up_image, map_data.marked_up_image, 3 );
     }
 
     // equalize the output if given 'e' flag
     if (equalize_output) {
-        equalize_image( map_data.marked_up_image );
+        equalize_image( &map_data.marked_up_image );
     }
 
     std::string output_window_name = WINDOW_NAME + " Output Image";
-    cv::imshow( output_window_name, *map_data.marked_up_image );
-    write_img_to_file( *map_data.marked_up_image, "./out", output_image_filename );
+    cv::imshow( output_window_name, map_data.marked_up_image );
+    write_img_to_file( map_data.marked_up_image, "./out", output_image_filename );
 
     // initialize the mouse callback
     map_data.window_name = &output_window_name;
@@ -155,7 +155,7 @@ main(int argc, const char** argv)
     // delete map_data.markers;
     delete map_data.map_mask;
     // delete map_data.region_of_interest;
-    delete map_data.marked_up_image;
+    // delete map_data.marked_up_image;
     delete map_data.boundaries;
 
     input_image.release();
