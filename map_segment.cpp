@@ -116,16 +116,15 @@ main(int argc, const char** argv)
 
     std::string output_window_name = WINDOW_NAME + " Output Image";
 
-    MapData map_data = {
-        output_window_name,                         // window_name
-        &input_image,                               // whole_map
-        NULL,                                       // map_mask
-        cv::Mat(),                                  // region_of_interest
-        std::vector<std::vector<cv::Point>>(),      // contours
-        std::vector<cv::Rect>(),                    // boundaries
-        cv::Mat(),                                  // markers
-        cv::Mat()                                   // marked_up_image
-    };
+    MapData map_data;
+    map_data.window_name = output_window_name;
+    map_data.whole_map = &input_image;
+    map_data.map_mask = NULL;
+    map_data.region_of_interest = cv::Mat();
+    map_data.contours = std::vector<std::vector<cv::Point>>();
+    map_data.boundaries = std::vector<cv::Rect>();
+    map_data.markers = cv::Mat();
+    map_data.marked_up_image = cv::Mat();
 
     // create mask, only distance filter on foreground
     //TODO make this better at background detection, not just black backgrounds
