@@ -37,6 +37,7 @@ higlight_selected_region(MapData* map_data, int marker_value)
 
     // draw original map back on
     draw_in_states( map_data );
+
     // highlight selected region
     draw_in_roi( map_data, marker_value );
 
@@ -51,10 +52,8 @@ higlight_selected_region(MapData* map_data, int marker_value)
     // draw the region seperately
     cv::Mat region_only = extract_selected_region( map_data, marker_value );
     region_only.copyTo( map_data->region_of_interest );
-    cv::imshow( "region_only", map_data->region_of_interest );
-    // wait_key();
-
     region_only.release();
+
 }
 
 
