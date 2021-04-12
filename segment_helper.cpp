@@ -1,5 +1,5 @@
 // segment_helper.cpp : This file contains the helper functions for the main
-// Austin Hester CS642o mar 2021
+// Austin Hester CS642o apr 2021
 // g++.exe (x86_64-posix-seh-rev0, Built by MinGW-W64 project) 8.1.0
 
 #include <opencv2/core/core.hpp>
@@ -100,7 +100,7 @@ draw_in_states(MapData* map_data)
 {
     // create single channel mask
     cv::Mat mask_8u;
-    map_data->map_mask->convertTo( mask_8u, CV_8U );
+    map_data->map_mask.convertTo( mask_8u, CV_8U );
 
     // fill in states
     for (int i = 0; i < map_data->markers.rows; i++)
@@ -122,7 +122,7 @@ draw_in_roi(MapData* map_data, int marker_value)
 {
     // create single channel mask
     cv::Mat mask_8u;
-    map_data->map_mask->convertTo( mask_8u, CV_8U );
+    map_data->map_mask.convertTo( mask_8u, CV_8U );
 
     // fill in selected region with 255, 255, 150
     for (int i = 0; i < map_data->markers.rows; i++)
@@ -174,11 +174,11 @@ distance_finder(cv::Mat borders)
 }
 
 // Trivial "black background only" background finder
-cv::Mat*
+cv::Mat
 make_background_mask(cv::Mat image)
 {
-    cv::Mat* mask = new cv::Mat();
-    cv::inRange( image, cv::Scalar::all(0), cv::Scalar::all(0), *mask );
+    cv::Mat mask;
+    cv::inRange( image, cv::Scalar::all(0), cv::Scalar::all(0), mask );
     return mask;
 }
 

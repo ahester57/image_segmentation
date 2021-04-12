@@ -1,5 +1,5 @@
 // segment_helper.hpp : Helper Functions
-// Austin Hester CS542o mar 2021
+// Austin Hester CS542o apr 2021
 // g++.exe (x86_64-posix-seh-rev0, Built by MinGW-W64 project) 8.1.0
 
 #ifndef SEGMENT_HELPER_H
@@ -13,7 +13,7 @@
 typedef struct {
     std::string window_name;
     cv::Mat* whole_map;
-    cv::Mat* map_mask;
+    cv::Mat map_mask;
     cv::Mat region_of_interest;
     std::vector<std::vector<cv::Point>> contours;
     std::vector<cv::Rect> boundaries;
@@ -38,7 +38,7 @@ void equalize_image(cv::Mat* image);
 
 cv::Mat distance_finder(cv::Mat borders);
 
-cv::Mat* make_background_mask(cv::Mat image);
+cv::Mat make_background_mask(cv::Mat image);
 
 cv::Mat create_bordered_map(cv::Mat canny_edges, cv::Mat mask);
 

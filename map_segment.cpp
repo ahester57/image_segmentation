@@ -1,5 +1,5 @@
 // map_segment.cpp : This file contains the 'main' function. Program execution begins and ends there.
-// Austin Hester CS642o mar 2021
+// Austin Hester CS642o apr 2021
 // g++.exe (x86_64-posix-seh-rev0, Built by MinGW-W64 project) 8.1.0
 
 #include <opencv2/core/core.hpp>
@@ -33,7 +33,7 @@ segment(MapData* map_data, bool grayscale, int hsv_plane = 2)
                                     : draw_color_canny_contours( *map_data->whole_map, hsv_plane ); // for usa.png, saturation is best to use imo
 
     // create bordered map
-    cv::Mat borders = create_bordered_map( canny_edges, *map_data->map_mask );
+    cv::Mat borders = create_bordered_map( canny_edges, map_data->map_mask );
     canny_edges.release();
 
     // distance transform on thresholded
@@ -56,7 +56,7 @@ segment(MapData* map_data, bool grayscale, int hsv_plane = 2)
 #if DEBUG
     cv::Mat markers_8U;
     map_data->markers.convertTo( markers_8U, CV_8U );
-    cv::bitwise_and( markers_8U, ~*map_data->map_mask, markers_8U );
+    cv::bitwise_and( markers_8U, ~map_data->map_mask, markers_8U );
     cv::imshow( "Markers 8U", markers_8U );
     markers_8U.release();
 #endif
@@ -119,7 +119,7 @@ main(int argc, const char** argv)
     MapData map_data;
     map_data.window_name = output_window_name;
     map_data.whole_map = &input_image;
-    map_data.map_mask = NULL;
+    map_data.map_mask = cv::Mat();
     map_data.region_of_interest = cv::Mat();
     map_data.contours = std::vector<std::vector<cv::Point>>();
     map_data.boundaries = std::vector<cv::Rect>();
@@ -160,10 +160,10 @@ main(int argc, const char** argv)
     cv::destroyAllWindows();
 
     // delete map_data.contours;
-    // delete map_data.markers;
-    delete map_data.map_mask;
-    // delete map_data.region_of_interest;
-    // delete map_data.marked_up_image;
+    map_data.markers.release();
+    map_data.map_mask.release();
+    map_data.region_of_interest.release();
+    map_data.marked_up_image.release();
     // delete map_data.boundaries;
 
     input_image.release();
