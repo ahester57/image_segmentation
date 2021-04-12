@@ -26,11 +26,9 @@ const std::string WINDOW_NAME = "Map Segmentation";
 void
 segment(MapData* map_data, bool grayscale, int hsv_plane = 2)
 {
-    cv::Size input_image_size = map_data->whole_map->size();
-
     // canny edge detection, returning contour map
-    cv::Mat canny_edges = grayscale ? draw_canny_contours( *map_data->whole_map )
-                                    : draw_color_canny_contours( *map_data->whole_map, hsv_plane ); // for usa.png, saturation is best to use imo
+    cv::Mat canny_edges = grayscale ? draw_canny_contours( map_data->whole_map )
+                                    : draw_color_canny_contours( map_data->whole_map, hsv_plane ); // for usa.png, saturation is best to use imo
 
     // create bordered map
     cv::Mat borders = create_bordered_map( canny_edges, map_data->map_mask );
@@ -51,7 +49,7 @@ segment(MapData* map_data, bool grayscale, int hsv_plane = 2)
     distance.release();
 
     // apply watershed algorithm
-    cv::watershed( *map_data->whole_map, map_data->markers );
+    cv::watershed( map_data->whole_map, map_data->markers );
 
 #if DEBUG
     cv::Mat markers_8U;
@@ -118,7 +116,7 @@ main(int argc, const char** argv)
 
     MapData map_data;
     map_data.window_name = output_window_name;
-    map_data.whole_map = &input_image;
+    input_image.copyTo( map_data.whole_map );
     map_data.map_mask = cv::Mat();
     map_data.region_of_interest = cv::Mat();
     map_data.contours = std::vector<std::vector<cv::Point>>();
@@ -128,13 +126,16 @@ main(int argc, const char** argv)
 
     // create mask, only distance filter on foreground
     //TODO make this better at background detection, not just black backgrounds
-    map_data.map_mask = make_background_mask( *map_data.whole_map );
+    map_data.map_mask = make_background_mask( map_data.whole_map );
 
     // segment the image by intensity
     segment( &map_data, grayscale, 2 );
-    // again by saturation, replacing the input with output from above
-    *map_data.whole_map = cv::Mat::zeros(map_data.whole_map->size(), map_data.whole_map->type());
-    map_data.marked_up_image.copyTo( *map_data.whole_map );
+
+    // replace the input_image with output from above segmentation
+    map_data.whole_map = cv::Mat::zeros( map_data.whole_map.size(), map_data.whole_map.type() );
+    map_data.marked_up_image.copyTo( map_data.whole_map );
+
+    // segment again on saturation
     segment( &map_data, grayscale, 1 );
 
     // blur the output if given 'b' flag
@@ -159,12 +160,11 @@ main(int argc, const char** argv)
 
     cv::destroyAllWindows();
 
-    // delete map_data.contours;
+    map_data.whole_map.release();
     map_data.markers.release();
     map_data.map_mask.release();
     map_data.region_of_interest.release();
     map_data.marked_up_image.release();
-    // delete map_data.boundaries;
 
     input_image.release();
 

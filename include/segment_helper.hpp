@@ -12,7 +12,7 @@
 
 typedef struct {
     std::string window_name;
-    cv::Mat* whole_map;
+    cv::Mat whole_map;
     cv::Mat map_mask;
     cv::Mat region_of_interest;
     std::vector<std::vector<cv::Point>> contours;

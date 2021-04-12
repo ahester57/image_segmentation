@@ -33,7 +33,7 @@ higlight_selected_region(MapData* map_data, int marker_value)
 {
 
     // zero-out region of interest
-    map_data->marked_up_image = cv::Mat::zeros( map_data->whole_map->size(), map_data->whole_map->type() );
+    map_data->marked_up_image = cv::Mat::zeros( map_data->whole_map.size(), map_data->whole_map.type() );
 
     // draw original map back on
     draw_in_states( map_data );
@@ -108,7 +108,7 @@ draw_in_states(MapData* map_data)
         {
             int pixel = map_data->markers.at<int>( i, j );
             if (pixel > 0 && pixel <= static_cast<int>(map_data->contours.size())) {
-                map_data->marked_up_image.at<cv::Vec3b>( i, j ) = map_data->whole_map->at<cv::Vec3b>( i, j );
+                map_data->marked_up_image.at<cv::Vec3b>( i, j ) = map_data->whole_map.at<cv::Vec3b>( i, j );
             }
         }
     }
