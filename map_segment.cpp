@@ -22,6 +22,20 @@
 const std::string WINDOW_NAME = "Map Segmentation";
 
 
+// event loop
+// call in a while loop to only register q or <esc>
+int
+wait_key()
+{
+    char key_pressed = cv::waitKey(0) & 255;
+    // 'q' or  <escape> quits out
+    if (key_pressed == 27 || key_pressed == 'q') {
+        return 0;
+    }
+    return 1;
+}
+
+// perform segmentation using canny edges, thresholding, and distance transform
 void
 segment(MapData* map_data, bool grayscale, int hsv_plane = 2)
 {
@@ -30,22 +44,22 @@ segment(MapData* map_data, bool grayscale, int hsv_plane = 2)
                                     : draw_color_canny_contours( map_data->whole_map, hsv_plane ); // for usa.png, saturation is best to use imo
 
     // create bordered map
-    cv::Mat borders = create_bordered_map( canny_edges, map_data->map_mask );
+    cv::Mat binary_image = create_binary_image_from_canny_edges( canny_edges, map_data->map_mask );
     canny_edges.release();
 
     // distance transform on thresholded
-    cv::Mat distance = distance_finder( borders );
-    borders.release();
+    cv::Mat distance_transform = distance_finder( binary_image );
+    binary_image.release();
 
     // find contours of distance transform
-    map_data->contours = find_distance_contours( distance );
+    map_data->contours = find_distance_contours( distance_transform );
 
     // find boundaries of the contours
     map_data->boundaries = draw_bounding_rects( map_data->contours );
 
     // create markers for foreground objects // aka "markers"
-    map_data->markers = draw_contours_as_markers( map_data->contours, distance.size() );
-    distance.release();
+    map_data->markers = draw_contours_as_markers( map_data->contours, distance_transform.size() );
+    distance_transform.release();
 
     // apply watershed algorithm
     cv::watershed( map_data->whole_map, map_data->markers );
@@ -116,12 +130,6 @@ main(int argc, const char** argv)
     MapData map_data;
     map_data.window_name = output_window_name;
     input_image.copyTo( map_data.whole_map );
-    map_data.map_mask = cv::Mat();
-    map_data.region_of_interest = cv::Mat();
-    map_data.contours = std::vector<std::vector<cv::Point>>();
-    map_data.boundaries = std::vector<cv::Rect>();
-    map_data.markers = cv::Mat();
-    map_data.marked_up_image = cv::Mat();
 
     // create mask, only distance filter on foreground
     //TODO make this better at background detection, not just black backgrounds

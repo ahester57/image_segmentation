@@ -7,10 +7,9 @@
 
 #include <opencv2/core/core.hpp>
 
-#include <vector>
-#include <iostream>
 
 std::vector<std::string> split (std::string s, char delim);
+
 std::string cv_type_to_str(cv::Mat img);
 
 #endif

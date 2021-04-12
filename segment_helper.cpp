@@ -3,7 +3,6 @@
 // g++.exe (x86_64-posix-seh-rev0, Built by MinGW-W64 project) 8.1.0
 
 #include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include <vector>
@@ -11,19 +10,6 @@
 #include "./include/hsv_convert.hpp"
 #include "./include/segment_helper.hpp"
 
-
-// event loop
-// call in a while loop to only register q or <esc>
-int
-wait_key()
-{
-    char key_pressed = cv::waitKey(0) & 255;
-    // 'q' or  <escape> quits out
-    if (key_pressed == 27 || key_pressed == 'q') {
-        return 0;
-    }
-    return 1;
-}
 
 // extract ROI ignoring out of bounds
 cv::Mat
@@ -58,12 +44,12 @@ equalize_image(cv::Mat* image)
     }
 }
 
-// find normalized distance transform of image
+// find normalized distance transform of binary image
 cv::Mat
-distance_finder(cv::Mat borders)
+distance_finder(cv::Mat binary_image)
 {
     cv::Mat distance;
-    cv::distanceTransform( borders, distance, cv::DIST_L2, 3 );
+    cv::distanceTransform( binary_image, distance, cv::DIST_L2, 3 );
     cv::normalize( distance, distance, 0.f, 1.f, cv::NORM_MINMAX );
     return distance;
 }
@@ -72,23 +58,10 @@ distance_finder(cv::Mat borders)
 cv::Mat
 make_background_mask(cv::Mat image)
 {
+    //TODO make this better at background detection, not just black backgrounds
     cv::Mat mask;
     cv::inRange( image, cv::Scalar::all(0), cv::Scalar::all(0), mask );
     return mask;
-}
-
-// created binary image of regions
-cv::Mat
-create_bordered_map(cv::Mat canny_edges, cv::Mat mask)
-{
-    cv::Mat canny_edges_8U; // aka "borders"
-    canny_edges.convertTo( canny_edges_8U, CV_8U, 100 );
-    cv::bitwise_not( canny_edges_8U, canny_edges_8U );
-    // apply mask to map
-    canny_edges_8U.setTo( cv::Scalar(0, 0, 0), mask );
-    // threshold bordered map output
-    cv::threshold( canny_edges_8U, canny_edges_8U, 55, 255, cv::THRESH_BINARY | cv::THRESH_OTSU );
-    return canny_edges_8U;
 }
 
 // find drawable contours from distance transformation

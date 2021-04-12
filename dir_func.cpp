@@ -8,6 +8,7 @@
 #include <opencv2/core/utils/filesystem.hpp>
 
 #include <fstream>
+#include <iostream>
 
 #include "./include/dir_func.hpp"
 #include "./include/string_helper.hpp"

@@ -3,7 +3,6 @@
 // g++.exe (x86_64-posix-seh-rev0, Built by MinGW-W64 project) 8.1.0
 
 #include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include "./include/canny.hpp"
@@ -19,7 +18,6 @@ draw_canny_contours(cv::Mat image)
     cv::GaussianBlur( image, canny_output, cv::Size( 3, 3 ), 0.5f );
 
     // compute canny edges
-    cv::imshow(" Canny Input Image", canny_output );
     cv::Canny( canny_output, canny_output, 75, 200 );
 
     // find the contours to draw
@@ -64,4 +62,18 @@ draw_color_canny_contours(cv::Mat image, int hsv_plane)
     hsv_planes[2].release();
     hsv_image.release();
     return canny_edges;
+}
+
+// created binary image of regions
+cv::Mat
+create_binary_image_from_canny_edges(cv::Mat canny_edges, cv::Mat mask)
+{
+    cv::Mat canny_edges_8U; // aka "borders"
+    canny_edges.convertTo( canny_edges_8U, CV_8U, 100 );
+    cv::bitwise_not( canny_edges_8U, canny_edges_8U );
+    // apply mask to map
+    canny_edges_8U.setTo( cv::Scalar(0, 0, 0), mask );
+    // threshold bordered map output
+    cv::threshold( canny_edges_8U, canny_edges_8U, 55, 255, cv::THRESH_BINARY | cv::THRESH_OTSU );
+    return canny_edges_8U;
 }

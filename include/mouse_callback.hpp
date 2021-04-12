@@ -6,10 +6,7 @@
 #ifndef MOUSE_CALLBACK_H
 #define MOUSE_CALLBACK_H
 
-#include <opencv2/core/core.hpp>
-
 #include "./map_helper.hpp"
-#include "./segment_helper.hpp"
 
 
 void mouse_callback_draw_zeros(int event, int x, int y, int d, void* userdata);

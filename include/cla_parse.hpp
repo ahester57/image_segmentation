@@ -5,7 +5,7 @@
 #ifndef CLA_PARSE_H
 #define CLA_PARSE_H
 
-#include <opencv2/core/core.hpp>
+#include <iostream>
 
 int parse_arguments(
     int argc,

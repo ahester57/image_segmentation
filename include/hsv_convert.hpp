@@ -8,6 +8,7 @@
 #include <opencv2/core/core.hpp>
 
 void bgr_to_hsv(cv::Mat bgr, cv::Mat* hsv);
+
 void hsv_to_bgr(cv::Mat hsv, cv::Mat* bgr);
 
 #endif
