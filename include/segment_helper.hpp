@@ -14,7 +14,7 @@ typedef struct {
     const std::string* window_name;
     cv::Mat* whole_map;
     cv::Mat* map_mask;
-    cv::Mat* region_of_interest;
+    cv::Mat region_of_interest;
     std::vector<std::vector<cv::Point>>* contours;
     std::vector<cv::Rect>* boundaries;
     cv::Mat* markers;
@@ -30,7 +30,11 @@ cv::Mat extract_selected_region(MapData* map_data, int marker_value);
 
 cv::Mat extract_roi_safe(cv::Mat image, cv::Rect rect);
 
-void equalize_image(cv::Mat* image, bool grayscale);
+void draw_in_states(MapData* map_data);
+
+void draw_in_roi(MapData* map_data, int marker_value);
+
+void equalize_image(cv::Mat* image);
 
 cv::Mat distance_finder(cv::Mat borders);
 

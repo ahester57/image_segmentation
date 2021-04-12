@@ -64,17 +64,8 @@ segment(MapData* map_data, bool grayscale, int hsv_plane = 2)
     // create new marked_up_image (the one we click on)
     *map_data->marked_up_image = cv::Mat::zeros( map_data->markers->size(), CV_8UC3 );
 
-    // fill in states
-    for (int i = 0; i < map_data->markers->rows; i++)
-    {
-        for (int j = 0; j < map_data->markers->cols; j++)
-        {
-            int pixel = map_data->markers->at<int>( i, j );
-            if (pixel > 0 && pixel <= static_cast<int>(map_data->contours->size())) {
-                map_data->marked_up_image->at<cv::Vec3b>( i, j ) = map_data->whole_map->at<cv::Vec3b>( i, j );
-            }
-        }
-    }
+    // draw original map back on
+    draw_in_states( map_data );
 
 }
 
@@ -123,7 +114,7 @@ main(int argc, const char** argv)
     while (wait_key());
 #endif
 
-    MapData map_data = { NULL, &input_image, NULL, &input_image, NULL, NULL, NULL, new cv::Mat() };
+    MapData map_data = { NULL, &input_image, NULL, cv::Mat(), NULL, NULL, NULL, new cv::Mat() };
 
     // create mask, only distance filter on foreground
     //TODO make this better at background detection, not just black backgrounds
@@ -143,7 +134,7 @@ main(int argc, const char** argv)
 
     // equalize the output if given 'e' flag
     if (equalize_output) {
-        equalize_image( map_data.marked_up_image, grayscale );
+        equalize_image( map_data.marked_up_image );
     }
 
     std::string output_window_name = WINDOW_NAME + " Output Image";
@@ -163,7 +154,7 @@ main(int argc, const char** argv)
     delete map_data.contours;
     delete map_data.markers;
     delete map_data.map_mask;
-    delete map_data.region_of_interest;
+    // delete map_data.region_of_interest;
     delete map_data.marked_up_image;
     delete map_data.boundaries;
 
