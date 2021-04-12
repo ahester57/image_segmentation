@@ -6,13 +6,13 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
-#include <iostream>
 #include <vector>
 
 #include "./include/affine.hpp"
 #include "./include/canny.hpp"
 #include "./include/cla_parse.hpp"
 #include "./include/dir_func.hpp"
+#include "./include/map_helper.hpp"
 #include "./include/mouse_callback.hpp"
 #include "./include/segment_helper.hpp"
 
@@ -20,7 +20,6 @@
 
 
 const std::string WINDOW_NAME = "Map Segmentation";
-
 
 
 void

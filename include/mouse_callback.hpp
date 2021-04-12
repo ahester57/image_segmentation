@@ -8,6 +8,7 @@
 
 #include <opencv2/core/core.hpp>
 
+#include "./map_helper.hpp"
 #include "./segment_helper.hpp"
 
 

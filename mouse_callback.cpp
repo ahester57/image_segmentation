@@ -8,7 +8,6 @@
 
 #include "./include/dir_func.hpp"
 #include "./include/mouse_callback.hpp"
-#include "./include/segment_helper.hpp"
 
 
 // draw zeros on image
