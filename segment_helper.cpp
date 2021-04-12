@@ -39,8 +39,14 @@ higlight_selected_region(MapData* map_data, int marker_value)
     draw_in_states( map_data );
     // highlight selected region
     draw_in_roi( map_data, marker_value );
+
     // draw the bounding rect of the selected region
-    cv::rectangle( map_data->marked_up_image, (*map_data->boundaries)[marker_value - 1], cv::Scalar::all(255), 2 );
+    cv::rectangle(
+        map_data->marked_up_image,
+        map_data->boundaries[marker_value - 1],
+        cv::Scalar::all(255),
+        2
+    );
 
     // draw the region seperately
     cv::Mat region_only = extract_selected_region( map_data, marker_value );
@@ -57,8 +63,12 @@ cv::Mat
 extract_selected_region(MapData* map_data, int marker_value)
 {
     // draw contours and get bounding rectangle
-    cv::Mat drawn_contour = draw_contour_as_marker( *map_data->contours, map_data->marked_up_image.size(), marker_value );
-    cv::Rect contour_bounds = (*map_data->boundaries)[marker_value - 1];
+    cv::Mat drawn_contour = draw_contour_as_marker(
+        *map_data->contours,
+        map_data->marked_up_image.size(),
+        marker_value
+    );
+    cv::Rect contour_bounds = map_data->boundaries[marker_value - 1];
 
     // grab the ROI
     drawn_contour = extract_roi_safe( drawn_contour, contour_bounds );
@@ -225,20 +235,19 @@ draw_contours_as_markers(std::vector<std::vector<cv::Point>> contours, cv::Size 
 }
 
 // create auxillary array of bounding rectangles
-std::vector<cv::Rect>*
+std::vector<cv::Rect>
 draw_bounding_rects(std::vector<std::vector<cv::Point>> contours)
 {
-    std::vector<cv::Rect>* boundaries = new std::vector<cv::Rect>;
-    *boundaries = std::vector<cv::Rect>( contours.size() );
+    std::vector<cv::Rect> boundaries = std::vector<cv::Rect>( contours.size() );
     for (size_t i = 0; i < contours.size(); i++) {
         int ii = static_cast<int>( i );
         std::vector<cv::Point> contours_poly;
         cv::approxPolyDP( contours[ii], contours_poly, 3, true );
-        (*boundaries)[ii] = cv::boundingRect( contours_poly );
+        boundaries[ii] = cv::boundingRect( contours_poly );
         // bump up size of rects just a bit
-        (*boundaries)[ii].x -= 5;
-        (*boundaries)[ii].y -= 5;
-        (*boundaries)[ii] += cv::Size( 10, 10 );
+        boundaries[ii].x -= 5;
+        boundaries[ii].y -= 5;
+        boundaries[ii] += cv::Size( 10, 10 );
     }
 
     return boundaries;

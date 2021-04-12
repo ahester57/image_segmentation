@@ -16,7 +16,7 @@ typedef struct {
     cv::Mat* map_mask;
     cv::Mat region_of_interest;
     std::vector<std::vector<cv::Point>>* contours;
-    std::vector<cv::Rect>* boundaries;
+    std::vector<cv::Rect> boundaries;
     cv::Mat markers;
     cv::Mat marked_up_image;
 } MapData;
@@ -48,6 +48,6 @@ cv::Mat draw_contour_as_marker(std::vector<std::vector<cv::Point>> contours, cv:
 
 cv::Mat draw_contours_as_markers(std::vector<std::vector<cv::Point>> contours, cv::Size canvas_size);
 
-std::vector<cv::Rect>* draw_bounding_rects(std::vector<std::vector<cv::Point>> contours);
+std::vector<cv::Rect> draw_bounding_rects(std::vector<std::vector<cv::Point>> contours);
 
 #endif

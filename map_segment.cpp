@@ -114,7 +114,18 @@ main(int argc, const char** argv)
     while (wait_key());
 #endif
 
-    MapData map_data = { NULL, &input_image, NULL, cv::Mat(), NULL, NULL, cv::Mat(), cv::Mat() };
+    std::string output_window_name = WINDOW_NAME + " Output Image";
+
+    MapData map_data = {
+        &output_window_name,        // window_name
+        &input_image,               // whole_map
+        NULL,                       // map_mask
+        cv::Mat(),                  // region_of_interest
+        NULL,                       // contours
+        std::vector<cv::Rect>(),    // boundaries
+        cv::Mat(),                  // markers
+        cv::Mat()                   // marked_up_image
+    };
 
     // create mask, only distance filter on foreground
     //TODO make this better at background detection, not just black backgrounds
@@ -137,8 +148,7 @@ main(int argc, const char** argv)
         equalize_image( &map_data.marked_up_image );
     }
 
-    std::string output_window_name = WINDOW_NAME + " Output Image";
-    cv::imshow( output_window_name, map_data.marked_up_image );
+    cv::imshow( *map_data.window_name, map_data.marked_up_image );
     write_img_to_file( map_data.marked_up_image, "./out", output_image_filename );
 
     // initialize the mouse callback
@@ -156,7 +166,7 @@ main(int argc, const char** argv)
     delete map_data.map_mask;
     // delete map_data.region_of_interest;
     // delete map_data.marked_up_image;
-    delete map_data.boundaries;
+    // delete map_data.boundaries;
 
     input_image.release();
 
