@@ -44,10 +44,10 @@ segment(MapData* map_data, bool grayscale, int hsv_plane = 2)
     map_data->contours = find_distance_contours( distance );
 
     // find boundaries of the contours
-    map_data->boundaries = draw_bounding_rects( *map_data->contours );
+    map_data->boundaries = draw_bounding_rects( map_data->contours );
 
     // create markers for foreground objects // aka "markers"
-    map_data->markers = draw_contours_as_markers( *map_data->contours, distance.size() );
+    map_data->markers = draw_contours_as_markers( map_data->contours, distance.size() );
     distance.release();
 
     // apply watershed algorithm
@@ -117,14 +117,14 @@ main(int argc, const char** argv)
     std::string output_window_name = WINDOW_NAME + " Output Image";
 
     MapData map_data = {
-        &output_window_name,        // window_name
-        &input_image,               // whole_map
-        NULL,                       // map_mask
-        cv::Mat(),                  // region_of_interest
-        NULL,                       // contours
-        std::vector<cv::Rect>(),    // boundaries
-        cv::Mat(),                  // markers
-        cv::Mat()                   // marked_up_image
+        &output_window_name,                        // window_name
+        &input_image,                               // whole_map
+        NULL,                                       // map_mask
+        cv::Mat(),                                  // region_of_interest
+        std::vector<std::vector<cv::Point>>(),      // contours
+        std::vector<cv::Rect>(),                    // boundaries
+        cv::Mat(),                                  // markers
+        cv::Mat()                                   // marked_up_image
     };
 
     // create mask, only distance filter on foreground
@@ -161,7 +161,7 @@ main(int argc, const char** argv)
 
     cv::destroyAllWindows();
 
-    delete map_data.contours;
+    // delete map_data.contours;
     // delete map_data.markers;
     delete map_data.map_mask;
     // delete map_data.region_of_interest;

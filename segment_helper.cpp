@@ -64,7 +64,7 @@ extract_selected_region(MapData* map_data, int marker_value)
 {
     // draw contours and get bounding rectangle
     cv::Mat drawn_contour = draw_contour_as_marker(
-        *map_data->contours,
+        map_data->contours,
         map_data->marked_up_image.size(),
         marker_value
     );
@@ -108,7 +108,7 @@ draw_in_states(MapData* map_data)
         for (int j = 0; j < map_data->markers.cols; j++)
         {
             int pixel = map_data->markers.at<int>( i, j );
-            if (pixel > 0 && pixel <= static_cast<int>(map_data->contours->size())) {
+            if (pixel > 0 && pixel <= static_cast<int>(map_data->contours.size())) {
                 map_data->marked_up_image.at<cv::Vec3b>( i, j ) = map_data->whole_map->at<cv::Vec3b>( i, j );
             }
         }
@@ -197,7 +197,7 @@ create_bordered_map(cv::Mat canny_edges, cv::Mat mask)
 }
 
 // find drawable contours from distance transformation
-std::vector<std::vector<cv::Point>>*
+std::vector<std::vector<cv::Point>>
 find_distance_contours(cv::Mat distance_transform)
 {
     cv::threshold( distance_transform, distance_transform, 0.01f, 1.f, cv::THRESH_BINARY );
@@ -205,8 +205,8 @@ find_distance_contours(cv::Mat distance_transform)
     cv::Mat distance_8U;
     distance_transform.convertTo( distance_8U, CV_8U );
 
-    std::vector<std::vector<cv::Point>>* contours = new std::vector<std::vector<cv::Point>>();
-    cv::findContours( distance_8U, *contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE );
+    std::vector<std::vector<cv::Point>> contours;
+    cv::findContours( distance_8U, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE );
 
     distance_8U.release();
     return contours;

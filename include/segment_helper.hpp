@@ -15,7 +15,7 @@ typedef struct {
     cv::Mat* whole_map;
     cv::Mat* map_mask;
     cv::Mat region_of_interest;
-    std::vector<std::vector<cv::Point>>* contours;
+    std::vector<std::vector<cv::Point>> contours;
     std::vector<cv::Rect> boundaries;
     cv::Mat markers;
     cv::Mat marked_up_image;
@@ -42,7 +42,7 @@ cv::Mat* make_background_mask(cv::Mat image);
 
 cv::Mat create_bordered_map(cv::Mat canny_edges, cv::Mat mask);
 
-std::vector<std::vector<cv::Point>>* find_distance_contours(cv::Mat distance_transform);
+std::vector<std::vector<cv::Point>> find_distance_contours(cv::Mat distance_transform);
 
 cv::Mat draw_contour_as_marker(std::vector<std::vector<cv::Point>> contours, cv::Size canvas_size, int marker_value);
 
