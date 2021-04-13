@@ -10,6 +10,13 @@
 #include "./include/map_helper.hpp"
 #include "./include/segment_helper.hpp"
 
+#define DEBUG 1
+
+#if DEBUG
+    #include <iostream>
+    #include "./include/string_helper.hpp"
+#endif
+
 
 void
 higlight_selected_region(MapData* map_data, int marker_value)
@@ -47,12 +54,12 @@ higlight_selected_region(MapData* map_data, int marker_value)
     map_data->marked_up_image = paint_region_over_map( map_data, bounding_rect );
 
     // draw the bounding rect of the selected region onto marked up image
-    cv::rectangle(
-        map_data->marked_up_image,
-        bounding_rect,
-        cv::Scalar::all(255),
-        2
-    );
+    // cv::rectangle(
+    //     map_data->marked_up_image,
+    //     bounding_rect,
+    //     cv::Scalar::all(255),
+    //     2
+    // );
 
 }
 
@@ -91,7 +98,12 @@ paint_map_atop_region(MapData* map_data, int marker_value, cv::Mat drawn_contour
     cv::cvtColor( contour_8u3, contour_8u3, cv::COLOR_GRAY2BGR );
 
     // paint region using porter duff
-    cv::Mat painted_region = bitwise_i1_atop_i2( map_data->whole_map, contour_8u3, map_mask_8u, drawn_contour);
+    cv::Mat painted_region;
+    try {
+        painted_region = bitwise_i1_atop_i2( map_data->whole_map, contour_8u3, map_mask_8u, drawn_contour );
+    } catch (...) {
+        map_data->whole_map.copyTo( painted_region );
+    }
 
     map_mask_8u.release();
     contour_8u3.release();
@@ -117,8 +129,18 @@ paint_region_over_map(MapData* map_data, cv::Rect bounding_rect)
     // pad roi mask
     cv::Mat padded_roi_mask = make_border_from_size_and_rect(roi_8u, map_mask_8u.size(), bounding_rect);
 
+#if DEBUG
+    std::cout << cv_type_to_str( map_mask_8u ) << " :: " << cv_type_to_str( padded_roi_mask );
+    std::cout << map_mask_8u.size() << " :: " << padded_roi_mask.size() << " :: " << roi_8u.size();
+#endif
+
     // paint the region of interest over the map
-    cv::Mat painted_map = bitwise_i1_over_i2( padded_roi, map_data->whole_map, padded_roi_mask, map_mask_8u);
+    cv::Mat painted_map;
+    try {
+        painted_map = bitwise_i1_over_i2( padded_roi, map_data->marked_up_image, padded_roi_mask, map_mask_8u );
+    } catch (...) {
+        map_data->marked_up_image.copyTo( painted_map );
+    }
 
     map_mask_8u.release();
     roi_8u.release();
@@ -132,11 +154,15 @@ cv::Mat
 make_border_from_size_and_rect(cv::Mat image, cv::Size target_size, cv::Rect rect)
 {
     int top = rect.y >= 0 ? rect.y : 0;
-    int bottom = target_size.height - rect.y - rect.height;
-    bottom = bottom >= 0 ? bottom : 0;
+    int bottom = target_size.height - top - rect.height;
+    bottom = bottom >= 0 && bottom + rect.height + top <= target_size.height ? bottom : 0;
     int left = rect.x >= 0 ? rect.x : 0;
-    int right = target_size.width - rect.x - rect.width;
-    right = right >= 0 ? right : 0;
+    int right = target_size.width - left - rect.width;
+    right = right >= 0 && right + rect.width + left <= target_size.width ? right : 0;
+
+#if DEBUG
+    std::cout << top << " " << bottom << " " << left << " " << right << std::endl;
+#endif
 
     cv::Mat padded_image;
     cv::copyMakeBorder(
