@@ -67,7 +67,7 @@ segment(MapData* map_data, bool grayscale, int hsv_plane = 2)
 #if DEBUG
     cv::Mat markers_8U;
     map_data->markers.convertTo( markers_8U, CV_8U );
-    cv::bitwise_and( markers_8U, ~map_data->map_mask, markers_8U );
+    cv::bitwise_and( markers_8U, map_data->map_mask, markers_8U );
     cv::imshow( "Markers 8U", markers_8U );
     markers_8U.release();
 #endif

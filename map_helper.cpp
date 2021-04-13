@@ -95,7 +95,7 @@ draw_in_roi(MapData* map_data, int marker_value)
         for (int j = 0; j < map_data->markers.cols; j++)
         {
             // skip if not in mask
-            if (mask_8u.at<uchar>( i, j ) != (uchar) 0) {
+            if (mask_8u.at<uchar>( i, j ) == (uchar) 0) {
                 continue;
             }
             int pixel = map_data->markers.at<int>( i, j );

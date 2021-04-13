@@ -72,7 +72,7 @@ create_binary_image_from_canny_edges(cv::Mat canny_edges, cv::Mat mask)
     canny_edges.convertTo( canny_edges_8U, CV_8U, 100 );
     cv::bitwise_not( canny_edges_8U, canny_edges_8U );
     // apply mask to map
-    canny_edges_8U.setTo( cv::Scalar(0, 0, 0), mask );
+    canny_edges_8U.setTo( cv::Scalar(0, 0, 0), ~mask );
     // threshold bordered map output
     cv::threshold( canny_edges_8U, canny_edges_8U, 55, 255, cv::THRESH_BINARY | cv::THRESH_OTSU );
     return canny_edges_8U;

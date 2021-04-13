@@ -61,7 +61,7 @@ make_background_mask(cv::Mat image)
     //TODO make this better at background detection, not just black backgrounds
     cv::Mat mask;
     cv::inRange( image, cv::Scalar::all(0), cv::Scalar::all(0), mask );
-    return mask;
+    return ~mask;
 }
 
 // find drawable contours from distance transformation
