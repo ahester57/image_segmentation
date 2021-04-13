@@ -44,8 +44,8 @@ higlight_selected_region(MapData* map_data, int marker_value)
     region_only.copyTo( map_data->region_of_interest );
 
     // double size of rect of roi
-    bounding_rect.x = map_data->marked_up_image.size().width / 2 - region_only.size().width / 2;
-    bounding_rect.y = map_data->marked_up_image.size().height / 2 - region_only.size().height / 2;
+    // bounding_rect.x = map_data->marked_up_image.size().width / 2 - region_only.size().width / 2;
+    // bounding_rect.y = map_data->marked_up_image.size().height / 2 - region_only.size().height / 2;
     bounding_rect += cv::Size( bounding_rect.width, bounding_rect.height );
 
     region_only.release();
@@ -153,12 +153,15 @@ paint_region_over_map(MapData* map_data, cv::Rect bounding_rect)
 cv::Mat
 make_border_from_size_and_rect(cv::Mat image, cv::Size target_size, cv::Rect rect)
 {
+    // math
     int top = rect.y >= 0 ? rect.y : 0;
-    int bottom = target_size.height - top - rect.height;
-    bottom = bottom >= 0 && bottom + rect.height + top <= target_size.height ? bottom : 0;
+    int bottom = target_size.height - rect.y - rect.height;
+    bottom = bottom >= 0 && bottom + rect.height + rect.y <= target_size.height ? bottom : 0;
+    bottom = rect.y < 0 ? bottom - rect.y : bottom;
     int left = rect.x >= 0 ? rect.x : 0;
-    int right = target_size.width - left - rect.width;
-    right = right >= 0 && right + rect.width + left <= target_size.width ? right : 0;
+    int right = target_size.width - rect.x - rect.width;
+    right = right >= 0 && right + rect.width + rect.x <= target_size.width ? right : 0;
+    right = rect.x < 0 ? right - rect.x : right;
 
 #if DEBUG
     std::cout << top << " " << bottom << " " << left << " " << right << std::endl;
