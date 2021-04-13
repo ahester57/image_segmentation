@@ -28,4 +28,6 @@ cv::Mat draw_contours_as_markers(std::vector<std::vector<cv::Point>> contours, c
 
 std::vector<cv::Rect> draw_bounding_rects(std::vector<std::vector<cv::Point>> contours);
 
+cv::Rect center_and_double_rect(cv::Rect rect, cv::Size target_size);
+
 #endif

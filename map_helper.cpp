@@ -42,24 +42,13 @@ higlight_selected_region(MapData* map_data, int marker_value)
 
     // copy the region to map_data
     region_only.copyTo( map_data->region_of_interest );
+    region_only.release();
 
     // double size of rect of roi
-    // bounding_rect.x = map_data->marked_up_image.size().width / 2 - region_only.size().width / 2;
-    // bounding_rect.y = map_data->marked_up_image.size().height / 2 - region_only.size().height / 2;
-    bounding_rect += cv::Size( bounding_rect.width, bounding_rect.height );
-
-    region_only.release();
+    bounding_rect = center_and_double_rect( bounding_rect, map_data->marked_up_image.size() );
 
     // place enlarged roi in marked up image
     map_data->marked_up_image = paint_region_over_map( map_data, bounding_rect );
-
-    // draw the bounding rect of the selected region onto marked up image
-    // cv::rectangle(
-    //     map_data->marked_up_image,
-    //     bounding_rect,
-    //     cv::Scalar::all(255),
-    //     2
-    // );
 
 }
 
@@ -102,6 +91,9 @@ paint_map_atop_region(MapData* map_data, int marker_value, cv::Mat drawn_contour
     try {
         painted_region = bitwise_i1_atop_i2( map_data->whole_map, contour_8u3, map_mask_8u, drawn_contour );
     } catch (...) {
+#if DEBUG
+        std::cerr << "ERROR : paint_map_atop_region" << std::endl;
+#endif
         map_data->whole_map.copyTo( painted_region );
     }
 
@@ -139,6 +131,9 @@ paint_region_over_map(MapData* map_data, cv::Rect bounding_rect)
     try {
         painted_map = bitwise_i1_over_i2( padded_roi, map_data->marked_up_image, padded_roi_mask, map_mask_8u );
     } catch (...) {
+#if DEBUG
+        std::cerr << "ERROR : paint_region_over_map" << std::endl;
+#endif
         map_data->marked_up_image.copyTo( painted_map );
     }
 
@@ -150,18 +145,47 @@ paint_region_over_map(MapData* map_data, cv::Rect bounding_rect)
     return painted_map;
 }
 
+// surround roi with black border before placing over map
 cv::Mat
 make_border_from_size_and_rect(cv::Mat image, cv::Size target_size, cv::Rect rect)
 {
     // math
     int top = rect.y >= 0 ? rect.y : 0;
     int bottom = target_size.height - rect.y - rect.height;
-    bottom = bottom >= 0 && bottom + rect.height + rect.y <= target_size.height ? bottom : 0;
-    bottom = rect.y < 0 ? bottom - rect.y : bottom;
+    if (top < 0 && bottom >= 0) {
+        bottom += top;
+        top = 0;
+    } else if (top >= 0 && bottom < 0) {
+        top += bottom;
+        bottom = 0;
+    }
+    if (top + bottom + rect.height > target_size.height) {
+        std::cout << "crap";
+        if (top > bottom) {
+            top += target_size.height - (top + bottom + rect.height);
+        } else {
+            bottom += target_size.height - (top + bottom + rect.height);
+        }
+    }
+
     int left = rect.x >= 0 ? rect.x : 0;
     int right = target_size.width - rect.x - rect.width;
-    right = right >= 0 && right + rect.width + rect.x <= target_size.width ? right : 0;
-    right = rect.x < 0 ? right - rect.x : right;
+    if (left < 0 && right >= 0) {
+        right += left;
+        top = 0;
+    } else if (left >= 0 && right < 0) {
+        left += right;
+        right = 0;
+    }
+    if (left + right + rect.width > target_size.width) {
+                std::cout << "crap";
+
+        if (left > right) {
+            left += target_size.width - (left + right + rect.width);
+        } else {
+            right += target_size.width - (left + right + rect.width);
+        }
+    }
 
 #if DEBUG
     std::cout << top << " " << bottom << " " << left << " " << right << std::endl;
