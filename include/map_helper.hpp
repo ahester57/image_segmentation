@@ -26,7 +26,11 @@ void higlight_selected_region(MapData* map_data, int marker_value);
 
 cv::Mat extract_selected_region(MapData* map_data, int marker_value);
 
-cv::Mat paint_region_over(MapData* map_data, int marker_value, cv::Mat drawn_contour);
+cv::Mat paint_region_with_map(MapData* map_data, int marker_value, cv::Mat drawn_contour);
+
+cv::Mat paint_region_onto_map(MapData* map_data, cv::Rect bounding_rect);
+
+cv::Mat make_border_from_size_and_rect(cv::Mat image, cv::Size target_size, cv::Rect rect);
 
 void draw_in_states(MapData* map_data);
 

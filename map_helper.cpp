@@ -10,6 +10,8 @@
 #include "./include/map_helper.hpp"
 #include "./include/segment_helper.hpp"
 
+    #include <iostream>
+    #include "./include/string_helper.hpp"
 
 void
 higlight_selected_region(MapData* map_data, int marker_value)
@@ -27,6 +29,27 @@ higlight_selected_region(MapData* map_data, int marker_value)
     // get bounding rect
     cv::Rect bounding_rect = map_data->boundaries[marker_value - 1];
 
+    // find origin of rect
+    // cv::Point roi_origin = cv::Point( bounding_rect.x, bounding_rect.y );
+
+    // extract the ROI
+    cv::Mat region_only = extract_selected_region( map_data, marker_value );
+
+    // double the size
+    region_only = resize_affine( region_only, 2.f );
+
+    // copy the region to map_data
+    region_only.copyTo( map_data->region_of_interest );
+
+    // bump up size of rects just a bit
+    bounding_rect.x = map_data->marked_up_image.size().width / 2 - region_only.size().width / 2;
+    bounding_rect.y = map_data->marked_up_image.size().height / 2 - region_only.size().height / 2;
+    bounding_rect += cv::Size( bounding_rect.width, bounding_rect.height );
+    region_only.release();
+
+    // place enlarged roi in marked up image
+    paint_region_onto_map( map_data, bounding_rect );
+
     // draw the bounding rect of the selected region onto marked up image
     cv::rectangle(
         map_data->marked_up_image,
@@ -34,17 +57,6 @@ higlight_selected_region(MapData* map_data, int marker_value)
         cv::Scalar::all(255),
         2
     );
-
-    // find origin of rect
-    cv::Point roi_origin = cv::Point( bounding_rect.x, bounding_rect.y );
-
-    // place enlarged roi in marked up image
-    //TODO
-
-    // draw the region seperately
-    cv::Mat region_only = extract_selected_region( map_data, marker_value );
-    region_only.copyTo( map_data->region_of_interest );
-    region_only.release();
 
 }
 
@@ -59,23 +71,19 @@ extract_selected_region(MapData* map_data, int marker_value)
         marker_value
     );
 
-    drawn_contour = paint_region_over( map_data, marker_value, drawn_contour );
-
-    // get bounding rectangle from auxillary array
-    cv::Rect contour_bounds = map_data->boundaries[marker_value - 1];
+    // paint real map over the region's mask
+    drawn_contour = paint_region_with_map( map_data, marker_value, drawn_contour );
 
     // grab the ROI
-    drawn_contour = extract_roi_safe( drawn_contour, contour_bounds );
-
-    // double the size
-    drawn_contour = resize_affine( drawn_contour, 2.f );
+    // get bounding rectangle from auxillary array
+    drawn_contour = extract_roi_safe( drawn_contour, map_data->boundaries[marker_value - 1] );
 
     return drawn_contour;
 }
 
-// paint the selected region over with whole_map
+// paint real map over the region of interest's mask
 cv::Mat
-paint_region_over(MapData* map_data, int marker_value, cv::Mat drawn_contour)
+paint_region_with_map(MapData* map_data, int marker_value, cv::Mat drawn_contour)
 {
     // create single channel mask
     cv::Mat map_mask_8u;
@@ -92,6 +100,67 @@ paint_region_over(MapData* map_data, int marker_value, cv::Mat drawn_contour)
     map_mask_8u.release();
     contour_8u3.release();
     return painted_region;
+}
+
+cv::Mat
+paint_region_onto_map(MapData* map_data, cv::Rect bounding_rect)
+{
+    // create single channel mask
+    cv::Mat map_mask_8u;
+    map_data->map_mask.convertTo( map_mask_8u, CV_8U );
+
+    // create 3 channel roi mask
+    cv::Mat roi_8u;
+    map_data->region_of_interest.convertTo( roi_8u, CV_8U );
+    cv::cvtColor( roi_8u, roi_8u, cv::COLOR_BGR2GRAY );
+
+    // pad roi
+    cv::Mat padded_roi = make_border_from_size_and_rect(map_data->region_of_interest, map_mask_8u.size(), bounding_rect);
+
+    // pad roi mask
+    cv::Mat padded_roi_mask = make_border_from_size_and_rect(roi_8u, map_mask_8u.size(), bounding_rect);
+
+    std::cout << cv_type_to_str( map_mask_8u ) << " :: " << cv_type_to_str( padded_roi_mask );
+    std::cout << map_mask_8u.size() << " :: " << padded_roi_mask.size() << " :: " << roi_8u.size();
+
+    cv::Mat painted_map = bitwise_i1_over_i2( padded_roi, map_data->whole_map, map_mask_8u, padded_roi_mask);
+
+    map_mask_8u.release();
+    roi_8u.release();
+    padded_roi.release();
+    padded_roi_mask.release();
+
+    return painted_map;
+}
+
+cv::Mat
+make_border_from_size_and_rect(cv::Mat image, cv::Size target_size, cv::Rect rect)
+{
+    int top = rect.y >= 0 ? rect.y : 0;
+    int bottom = target_size.height - rect.y - rect.height;
+    bottom = bottom >= 0 ? bottom : 0;
+    int left = rect.x >= 0 ? rect.x : 0;
+    int right = target_size.width - rect.x - rect.width;
+    right = right >= 0 ? right : 0;
+
+    std::cout << std::endl <<top<<std::endl;
+    std::cout << std::endl <<bottom<<std::endl;
+    std::cout << std::endl <<left<<std::endl;
+    std::cout << std::endl <<right<<std::endl;
+
+    cv::Mat padded_image;
+    cv::copyMakeBorder(
+        image,
+        padded_image,
+        top,
+        bottom,
+        left,
+        right,
+        cv::BORDER_CONSTANT,
+        cv::Scalar(0)
+    );
+
+    return padded_image;
 }
 
 // draw original states back onto marked_up_image

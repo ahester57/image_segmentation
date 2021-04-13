@@ -37,6 +37,10 @@ mouse_callback_draw_zeros(int event, int x, int y, int d, void* userdata)
                 "regions/out_" + std::to_string(marker_value) + ".png"
             );
             break;
+        // case cv::EVENT_RBUTTONUP:
+        //     // show whole_map
+        //     cv::imshow( map_data->window_name, map_data->whole_map );
+        //     break;
     }
 }
 
