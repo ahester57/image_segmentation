@@ -118,7 +118,7 @@ paint_region_over_map(MapData* map_data, cv::Rect bounding_rect)
     cv::Mat padded_roi_mask = make_border_from_size_and_rect(roi_8u, map_mask_8u.size(), bounding_rect);
 
     // paint the region of interest over the map
-    cv::Mat painted_map = bitwise_i1_over_i2( padded_roi, map_data->marked_up_image, padded_roi_mask, map_mask_8u);
+    cv::Mat painted_map = bitwise_i1_over_i2( padded_roi, map_data->whole_map, padded_roi_mask, map_mask_8u);
 
     map_mask_8u.release();
     roi_8u.release();
@@ -137,11 +137,6 @@ make_border_from_size_and_rect(cv::Mat image, cv::Size target_size, cv::Rect rec
     int left = rect.x >= 0 ? rect.x : 0;
     int right = target_size.width - rect.x - rect.width;
     right = right >= 0 ? right : 0;
-
-    std::cout << std::endl <<top<<std::endl;
-    std::cout << std::endl <<bottom<<std::endl;
-    std::cout << std::endl <<left<<std::endl;
-    std::cout << std::endl <<right<<std::endl;
 
     cv::Mat padded_image;
     cv::copyMakeBorder(

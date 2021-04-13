@@ -25,7 +25,7 @@ mouse_callback_draw_zeros(int event, int x, int y, int d, void* userdata)
             higlight_selected_region( map_data, marker_value );
 
             // show region_of_interest
-            cv::imshow( "region_of_interest", map_data->region_of_interest );
+            // cv::imshow( "region_of_interest", map_data->region_of_interest );
 
             // show marked_up_image
             cv::imshow( map_data->window_name, map_data->marked_up_image );
