@@ -26,7 +26,6 @@ mouse_callback_draw_zeros(int event, int x, int y, int d, void* userdata)
 
             // show region_of_interest
             cv::imshow( "region_of_interest", map_data->region_of_interest );
-            // wait_key();
 
             // show marked_up_image
             cv::imshow( map_data->window_name, map_data->marked_up_image );

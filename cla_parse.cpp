@@ -16,18 +16,16 @@ parse_arguments(
     std::string* output_image_filename,
     float* scale_image_value,
     bool* blur_output,
-    bool* equalize_output,
-    int* hsv_plane,
-    bool* grayscale
+    bool* equalize_output
 ) {
     cv::String keys =
         "{@input_image    |<none>| Input Image}"
         "{@output_image   |<none>| Output Image}"
-        "{grayscale g     |      | Read Input As Grayscale}"
+        // "{grayscale g     |      | Read Input As Grayscale}"
         "{scale s         |1.f   | Scale Input Image Size}"
         "{equalize e      |      | Equalize Output Image}"
         "{blur b          |      | Blur Output Image}"
-        "{hsv_plane p     |2     | HSV Plane to Use: 0 = H, 1 = S, 2 = V}"
+        // "{hsv_plane p     |2     | HSV Plane to Use: 0 = H, 1 = S, 2 = V}"
         "{help h          |      | Show Help Message}";
 
     cv::CommandLineParser parser(argc, argv, keys);
@@ -83,21 +81,21 @@ parse_arguments(
         return -1;
     }
 
-    try {
-        *hsv_plane = (float) parser.get<int>("p");
-        assert( *hsv_plane >= 0 && *hsv_plane <= 2 );
-    } catch (...) {
-        std::cerr << "Failed to parse hsv_plane argument!:" << std::endl;
-        return -1;
-    }
+    // try {
+    //     *hsv_plane = (float) parser.get<int>("p");
+    //     assert( *hsv_plane >= 0 && *hsv_plane <= 2 );
+    // } catch (...) {
+    //     std::cerr << "Failed to parse hsv_plane argument!:" << std::endl;
+    //     return -1;
+    // }
 
-    try {
-        *grayscale = parser.has("g");
-        assert( *grayscale >= 0 && *grayscale <= 2 );
-    } catch (...) {
-        std::cerr << "Failed to parse grayscale argument!:" << std::endl;
-        return -1;
-    }
+    // try {
+    //     *grayscale = parser.has("g");
+    //     assert( *grayscale >= 0 && *grayscale <= 2 );
+    // } catch (...) {
+    //     std::cerr << "Failed to parse grayscale argument!:" << std::endl;
+    //     return -1;
+    // }
 
     std::cout << std::endl << "Shortcuts:" << std::endl << "\tq\t- quit" << std::endl << std::endl;
 

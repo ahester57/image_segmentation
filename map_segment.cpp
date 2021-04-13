@@ -16,7 +16,7 @@
 #include "./include/mouse_callback.hpp"
 #include "./include/segment_helper.hpp"
 
-#define DEBUG 1
+#define DEBUG 0
 
 
 const std::string WINDOW_NAME = "Map Segmentation";
@@ -37,11 +37,10 @@ wait_key()
 
 // perform segmentation using canny edges, thresholding, and distance transform
 void
-segment(MapData* map_data, bool grayscale, int hsv_plane = 2)
+segment(MapData* map_data, int hsv_plane = 2)
 {
     // canny edge detection, returning contour map
-    cv::Mat canny_edges = grayscale ? draw_canny_contours( map_data->whole_map )
-                                    : draw_color_canny_contours( map_data->whole_map, hsv_plane ); // for usa.png, saturation is best to use imo
+    cv::Mat canny_edges = draw_color_canny_contours( map_data->whole_map, hsv_plane ); // for usa.png, saturation is best to use imo
 
     // create bordered map
     cv::Mat binary_image = create_binary_image_from_canny_edges( canny_edges, map_data->map_mask );
@@ -91,8 +90,6 @@ main(int argc, const char** argv)
     float scale_image_value;
     bool blur_output;
     bool equalize_output;
-    int hsv_plane;
-    bool grayscale;
 
     // parse and save command line args
     int parse_result = parse_arguments(
@@ -101,13 +98,11 @@ main(int argc, const char** argv)
         &output_image_filename,
         &scale_image_value,
         &blur_output,
-        &equalize_output,
-        &hsv_plane,
-        &grayscale
+        &equalize_output
     );
     if (parse_result != 1) return parse_result;
 
-    cv::Mat input_image = open_image( input_image_filename, grayscale );
+    cv::Mat input_image = open_image( input_image_filename );
 
     // crop if odd resolution
     input_image = input_image(
@@ -136,14 +131,14 @@ main(int argc, const char** argv)
     map_data.map_mask = make_background_mask( map_data.whole_map );
 
     // segment the image by intensity
-    segment( &map_data, grayscale, 2 );
+    segment( &map_data, 2 );
 
     // replace the input_image with output from above segmentation
     map_data.whole_map = cv::Mat::zeros( map_data.whole_map.size(), map_data.whole_map.type() );
     map_data.marked_up_image.copyTo( map_data.whole_map );
 
     // segment again on saturation
-    segment( &map_data, grayscale, 1 );
+    segment( &map_data, 1 );
 
     // blur the output if given 'b' flag
     if (blur_output) {

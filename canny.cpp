@@ -31,7 +31,6 @@ draw_canny_contours(cv::Mat image)
         cv::drawContours( canvas, contours, i, cv::Scalar(255), 1, cv::LINE_8, hierarchy, 0 );
     }
 
-    // cv::imshow(" Canny Output Image", canvas );
     canny_output.release();
     return canvas;
 }
