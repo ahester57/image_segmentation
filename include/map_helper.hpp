@@ -26,6 +26,8 @@ void higlight_selected_region(MapData* map_data, int marker_value);
 
 cv::Mat extract_selected_region(MapData* map_data, int marker_value);
 
+cv::Mat paint_region_over(MapData* map_data, int marker_value, cv::Mat drawn_contour);
+
 void draw_in_states(MapData* map_data);
 
 void draw_in_roi(MapData* map_data, int marker_value);

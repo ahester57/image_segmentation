@@ -6,6 +6,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include "./include/affine.hpp"
+#include "./include/bitwise_porter_duff_ops.hpp"
 #include "./include/map_helper.hpp"
 #include "./include/segment_helper.hpp"
 
@@ -42,12 +43,16 @@ higlight_selected_region(MapData* map_data, int marker_value)
 cv::Mat
 extract_selected_region(MapData* map_data, int marker_value)
 {
-    // draw contours and get bounding rectangle
+    // draw contours at given marker_value
     cv::Mat drawn_contour = draw_contour_as_marker(
         map_data->contours,
         map_data->marked_up_image.size(),
         marker_value
     );
+
+    drawn_contour = paint_region_over( map_data, marker_value, drawn_contour );
+
+    // get bounding rectangle from auxillary array
     cv::Rect contour_bounds = map_data->boundaries[marker_value - 1];
 
     // grab the ROI
@@ -57,6 +62,27 @@ extract_selected_region(MapData* map_data, int marker_value)
     drawn_contour = resize_affine( drawn_contour, 2.f );
 
     return drawn_contour;
+}
+
+// paint the selected region over with whole_map
+cv::Mat
+paint_region_over(MapData* map_data, int marker_value, cv::Mat drawn_contour)
+{
+    // create single channel mask
+    cv::Mat map_mask_8u;
+    map_data->map_mask.convertTo( map_mask_8u, CV_8U );
+
+    // create 3 channel contour
+    cv::Mat contour_8u3;
+    drawn_contour.convertTo( contour_8u3, CV_8UC3 );
+    cv::cvtColor( contour_8u3, contour_8u3, cv::COLOR_GRAY2BGR );
+
+    // paint region using porter duff
+    cv::Mat painted_region = bitwise_i1_atop_i2( map_data->whole_map, contour_8u3, map_mask_8u, drawn_contour);
+
+    map_mask_8u.release();
+    contour_8u3.release();
+    return painted_region;
 }
 
 // draw original states back onto marked_up_image
