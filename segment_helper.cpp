@@ -136,8 +136,12 @@ center_and_double_rect(cv::Rect rect, cv::Size target_size)
         rect.y += 2 * old_y;
     }
     rect += cv::Size(
-        old_x < 0 ? rect.width + 2 * old_x : rect.width,
-        old_y < 0 ? rect.height + 2 * old_y : rect.height
+        (old_x) < 0 ? rect.width + 2 * old_x :
+            (old_x + rect.width > target_size.width) ? rect.width - (target_size.width - old_x) :
+                rect.width,
+        (old_y < 0) ? rect.height + 2 * old_y :
+            (old_y + rect.height > target_size.height) ? rect.height - (target_size.height - old_y) :
+                rect.height
     );
     return rect;
 }

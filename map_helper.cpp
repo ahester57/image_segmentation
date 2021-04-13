@@ -159,13 +159,10 @@ make_border_from_size_and_rect(cv::Mat image, cv::Size target_size, cv::Rect rec
         top += bottom;
         bottom = 0;
     }
-    if (top + bottom + rect.height > target_size.height) {
-        std::cout << "crap";
-        if (top > bottom) {
-            top += target_size.height - (top + bottom + rect.height);
-        } else {
-            bottom += target_size.height - (top + bottom + rect.height);
-        }
+    if (bottom > top) {
+        top += std::abs( target_size.height - (top + bottom + rect.height) );
+    } else {
+        bottom += std::abs( target_size.height - (top + bottom + rect.height) );
     }
 
     int left = rect.x >= 0 ? rect.x : 0;
@@ -177,14 +174,10 @@ make_border_from_size_and_rect(cv::Mat image, cv::Size target_size, cv::Rect rec
         left += right;
         right = 0;
     }
-    if (left + right + rect.width > target_size.width) {
-                std::cout << "crap";
-
-        if (left > right) {
-            left += target_size.width - (left + right + rect.width);
-        } else {
-            right += target_size.width - (left + right + rect.width);
-        }
+    if (right > left) {
+        left += std::abs( target_size.width - (left + right + rect.width) );
+    } else {
+        right += std::abs( target_size.width - (left + right + rect.width) );
     }
 
 #if DEBUG
