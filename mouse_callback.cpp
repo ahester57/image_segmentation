@@ -6,8 +6,9 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-#include "./include/dir_func.hpp"
 #include "./include/mouse_callback.hpp"
+
+#include "./include/dir_func.hpp"
 
 #define DEBUG 1
 
@@ -21,11 +22,11 @@ void
 mouse_callback_draw_zeros(int event, int x, int y, int d, void* userdata)
 {
     MapData* map_data = (MapData*) userdata;
+            int marker_value = map_data->markers.at<int>( y, x );
 
     switch (event) {
         case cv::EVENT_LBUTTONUP:
             // find the marker at that point
-            int marker_value = map_data->markers.at<int>( y, x );
 
 #if DEBUG
             std::cout << "Marker Value:\t\t" << marker_value << std::endl;

@@ -7,22 +7,10 @@
 
 #include <vector>
 
-#include "./include/hsv_convert.hpp"
 #include "./include/segment_helper.hpp"
 
+#include "./include/hsv_convert.hpp"
 
-// extract ROI ignoring out of bounds
-cv::Mat
-extract_roi_safe(cv::Mat image, cv::Rect rect)
-{
-    // adjust contour_bounds to prevent out of bounds errors
-    cv::Rect image_rect = cv::Rect( {}, image.size() );
-    cv::Rect intersection = image_rect & rect;
-    cv::Rect inter_roi = intersection - image_rect.tl();
-
-    // grab the ROI
-    return image( inter_roi );
-}
 
 // equalize given image
 void
@@ -110,7 +98,7 @@ draw_bounding_rects(std::vector<std::vector<cv::Point>> contours)
     for (size_t i = 0; i < contours.size(); i++) {
         int ii = static_cast<int>( i );
         std::vector<cv::Point> contours_poly;
-        cv::approxPolyDP( contours[ii], contours_poly, 3, true );
+        cv::approxPolyDP( contours[ii], contours_poly, 1, true );
         boundaries[ii] = cv::boundingRect( contours_poly );
         // bump up size of rects just a bit
         boundaries[ii].x -= 5;

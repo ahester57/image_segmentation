@@ -5,9 +5,11 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
+#include "./include/map_helper.hpp"
+
 #include "./include/affine.hpp"
 #include "./include/bitwise_porter_duff_ops.hpp"
-#include "./include/map_helper.hpp"
+#include "./include/region_of_interest.hpp"
 #include "./include/segment_helper.hpp"
 
 #define DEBUG 1
@@ -123,13 +125,18 @@ paint_region_over_map(MapData* map_data, cv::Rect bounding_rect)
 
 #if DEBUG
     std::cout << cv_type_to_str( map_mask_8u ) << " :: " << cv_type_to_str( padded_roi_mask ) << std::endl;
-    std::cout << map_mask_8u.size() << " :: " << padded_roi_mask.size() << " :: " << roi_8u.size() << std::endl;
+    std::cout << map_mask_8u.size() << " :: " << map_mask_8u.size() << std::endl;
 #endif
 
     // paint the region of interest over the map
     cv::Mat painted_map;
     try {
-        painted_map = bitwise_i1_over_i2( padded_roi, map_data->marked_up_image, padded_roi_mask, map_mask_8u );
+        painted_map = bitwise_i1_over_i2(
+            padded_roi,
+            map_data->marked_up_image,
+            padded_roi_mask,
+            padded_roi_mask
+        );
     } catch (...) {
 #if DEBUG
         std::cerr << "ERROR : paint_region_over_map" << std::endl;

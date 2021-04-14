@@ -12,8 +12,6 @@
 
 int wait_key();
 
-cv::Mat extract_roi_safe(cv::Mat image, cv::Rect rect);
-
 void equalize_image(cv::Mat* image);
 
 cv::Mat distance_finder(cv::Mat borders);
