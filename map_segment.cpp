@@ -90,6 +90,7 @@ main(int argc, const char** argv)
     float scale_image_value;
     bool blur_output;
     bool equalize_output;
+    bool pad_input = true;
 
     // parse and save command line args
     int parse_result = parse_arguments(
@@ -112,6 +113,12 @@ main(int argc, const char** argv)
     // scale the input size if given 's' flag
     if (scale_image_value != 1.f) {
         input_image = resize_affine( input_image, scale_image_value );
+        std::cout << "Scaled Image size is:\t\t" << input_image.cols << "x" << input_image.rows << std::endl;
+    }
+
+    if (pad_input) {
+        cv::copyMakeBorder( input_image, input_image, 50, 50, 50, 50, cv::BORDER_CONSTANT, cv::Scalar(0) );
+        std::cout << "Padded Image size is:\t\t" << input_image.cols << "x" << input_image.rows << std::endl;
     }
 
 #if DEBUG

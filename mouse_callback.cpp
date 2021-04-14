@@ -9,6 +9,12 @@
 #include "./include/dir_func.hpp"
 #include "./include/mouse_callback.hpp"
 
+#define DEBUG 1
+
+#if DEBUG
+    #include <iostream>
+#endif
+
 
 // draw zeros on image
 void
@@ -20,6 +26,14 @@ mouse_callback_draw_zeros(int event, int x, int y, int d, void* userdata)
         case cv::EVENT_LBUTTONUP:
             // find the marker at that point
             int marker_value = map_data->markers.at<int>( y, x );
+
+#if DEBUG
+            std::cout << "Marker Value:\t\t" << marker_value << std::endl;
+#endif
+
+            if (marker_value == 0) {
+                break;
+            }
 
             // extract region_of_interest
             higlight_selected_region( map_data, marker_value );

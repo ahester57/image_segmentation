@@ -122,8 +122,8 @@ paint_region_over_map(MapData* map_data, cv::Rect bounding_rect)
     cv::Mat padded_roi_mask = make_border_from_size_and_rect(roi_8u, map_mask_8u.size(), bounding_rect);
 
 #if DEBUG
-    std::cout << cv_type_to_str( map_mask_8u ) << " :: " << cv_type_to_str( padded_roi_mask );
-    std::cout << map_mask_8u.size() << " :: " << padded_roi_mask.size() << " :: " << roi_8u.size();
+    std::cout << cv_type_to_str( map_mask_8u ) << " :: " << cv_type_to_str( padded_roi_mask ) << std::endl;
+    std::cout << map_mask_8u.size() << " :: " << padded_roi_mask.size() << " :: " << roi_8u.size() << std::endl;
 #endif
 
     // paint the region of interest over the map
@@ -159,11 +159,18 @@ make_border_from_size_and_rect(cv::Mat image, cv::Size target_size, cv::Rect rec
         top += bottom;
         bottom = 0;
     }
-    if (bottom > top) {
-        top += std::abs( target_size.height - (top + bottom + rect.height) );
-    } else {
-        bottom += std::abs( target_size.height - (top + bottom + rect.height) );
+    if (bottom < 0 && top >= 0) {
+        top += bottom;
+        bottom = 0;
+    } else if (bottom >= 0 && top < 0) {
+        bottom += top;
+        top = 0;
     }
+    // if (bottom > top) {
+    //     top += std::abs( target_size.height - (top + bottom + rect.height) );
+    // } else {
+    //     bottom += std::abs( target_size.height - (top + bottom + rect.height) );
+    // }
 
     int left = rect.x >= 0 ? rect.x : 0;
     int right = target_size.width - rect.x - rect.width;
@@ -174,11 +181,18 @@ make_border_from_size_and_rect(cv::Mat image, cv::Size target_size, cv::Rect rec
         left += right;
         right = 0;
     }
-    if (right > left) {
-        left += std::abs( target_size.width - (left + right + rect.width) );
-    } else {
-        right += std::abs( target_size.width - (left + right + rect.width) );
+    if (left < 0 && right >= 0) {
+        right += left;
+        left = 0;
+    } else if (left >= 0 && right < 0) {
+        left += right;
+        right = 0;
     }
+    // if (right > left) {
+    //     left += std::abs( target_size.width - (left + right + rect.width) );
+    // } else {
+    //     right += std::abs( target_size.width - (left + right + rect.width) );
+    // }
 
 #if DEBUG
     std::cout << top << " " << bottom << " " << left << " " << right << std::endl;
