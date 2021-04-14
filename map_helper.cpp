@@ -5,6 +5,8 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
+#include <iostream>
+
 #include "./include/map_helper.hpp"
 
 #include "./include/affine.hpp"
@@ -15,7 +17,6 @@
 #define DEBUG 1
 
 #if DEBUG
-    #include <iostream>
     #include "./include/string_helper.hpp"
 #endif
 
@@ -93,9 +94,7 @@ paint_map_atop_region(MapData* map_data, int marker_value, cv::Mat drawn_contour
     try {
         painted_region = bitwise_i1_atop_i2( map_data->whole_map, contour_8u3, map_mask_8u, drawn_contour );
     } catch (...) {
-#if DEBUG
         std::cerr << "ERROR : paint_map_atop_region" << std::endl;
-#endif
         map_data->whole_map.copyTo( painted_region );
     }
 
@@ -138,9 +137,7 @@ paint_region_over_map(MapData* map_data, cv::Rect bounding_rect)
             padded_roi_mask
         );
     } catch (...) {
-#if DEBUG
         std::cerr << "ERROR : paint_region_over_map" << std::endl;
-#endif
         map_data->marked_up_image.copyTo( painted_map );
     }
 
@@ -204,6 +201,11 @@ make_border_from_size_and_rect(cv::Mat image, cv::Size target_size, cv::Rect rec
 #if DEBUG
     std::cout << top << " " << bottom << " " << left << " " << right << std::endl;
 #endif
+
+    top = top < 0 ? 0 : top;
+    bottom = bottom < 0 ? 0 : bottom;
+    left = left < 0 ? 0 : left;
+    right = right < 0 ? 0 : right;
 
     cv::Mat padded_image;
     cv::copyMakeBorder(
