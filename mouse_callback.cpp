@@ -24,10 +24,18 @@ mouse_callback_draw_zeros(int event, int x, int y, int d, void* userdata)
     MapData* map_data = (MapData*) userdata;
 
     switch (event) {
+        // RIGHT MOUSE BUTTON
         case cv::EVENT_RBUTTONUP:
-            // show whole_map
+            // zero-out region of interest
+            map_data->marked_up_image = cv::Mat::zeros( map_data->whole_map.size(), map_data->whole_map.type() );
+
+            // draw original map back on
+            draw_in_states( map_data );
+
+            // show marked_up_image
             cv::imshow( map_data->window_name, map_data->whole_map );
             break;
+        // LEFT MOUSE BUTTON
         case cv::EVENT_LBUTTONUP:
             // find the marker at that point
             int marker_value = map_data->markers.at<int>( y, x );
