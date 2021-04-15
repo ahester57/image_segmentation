@@ -24,7 +24,8 @@ mouse_callback_draw_zeros(int event, int x, int y, int d, void* userdata)
     MapData* map_data = (MapData*) userdata;
 
     switch (event) {
-        // RIGHT MOUSE BUTTON
+
+    // RIGHT MOUSE BUTTON
         case cv::EVENT_RBUTTONUP:
             // zero-out region of interest
             map_data->marked_up_image = cv::Mat::zeros( map_data->whole_map.size(), map_data->whole_map.type() );
@@ -35,23 +36,35 @@ mouse_callback_draw_zeros(int event, int x, int y, int d, void* userdata)
             // show marked_up_image
             cv::imshow( map_data->window_name, map_data->whole_map );
             break;
-        // LEFT MOUSE BUTTON
+
+    // LEFT MOUSE BUTTON
         case cv::EVENT_LBUTTONUP:
+            // check bounds (needed if double ROI is larger than input image
+            if (x > map_data->markers.size().width || y > map_data->markers.size().height) {
+#if DEBUG
+                std::cout << "OOB" << std::endl;
+#endif
+                break;
+            }
+
             // find the marker at that point
             int marker_value = map_data->markers.at<int>( y, x );
 
 #if DEBUG
             std::cout << "Marker Value:\t\t" << marker_value << std::endl;
 #endif
-
-            if (marker_value == 0) {
+            // check marker exists
+            if (marker_value <= 0 || marker_value > map_data->contours.size()) {
+#if DEBUG
+                std::cout << "Marker Out of Range." << std::endl;
+#endif
                 break;
             }
 
             // extract region_of_interest
             higlight_selected_region( map_data, marker_value );
 
-            // show region_of_interest
+            // show region_of_interest in new window
             // cv::imshow( "region_of_interest", map_data->region_of_interest );
 
             // show marked_up_image

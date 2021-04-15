@@ -11,15 +11,62 @@
 
 #include "./include/affine.hpp"
 #include "./include/bitwise_porter_duff_ops.hpp"
+#include "./include/canny.hpp"
+#include "./include/rectangle.hpp"
 #include "./include/region_of_interest.hpp"
-#include "./include/segment_helper.hpp"
+#include "./include/segmentation.hpp"
 
-#define DEBUG 1
+#define DEBUG 0
 
 #if DEBUG
+    #include <opencv2/highgui/highgui.hpp>
     #include "./include/string_helper.hpp"
 #endif
 
+
+// perform segmentation using canny edges, thresholding, and distance transform
+void
+segment(MapData* map_data, int hsv_plane)
+{
+    // canny edge detection, returning contour map
+    cv::Mat canny_edges = draw_color_canny_contours( map_data->whole_map, hsv_plane ); // for usa.png, saturation is best to use imo
+
+    // create bordered map
+    cv::Mat binary_image = create_binary_image_from_canny_edges( canny_edges, map_data->map_mask );
+    canny_edges.release();
+
+    // distance transform on thresholded
+    cv::Mat distance_transform = distance_finder( binary_image );
+    binary_image.release();
+
+    // find contours of distance transform
+    map_data->contours = find_distance_contours( distance_transform );
+
+    // find boundaries of the contours
+    map_data->boundaries = draw_bounding_rects( map_data->contours );
+
+    // create markers for foreground objects // aka "markers"
+    map_data->markers = draw_contours_as_markers( map_data->contours, distance_transform.size() );
+    distance_transform.release();
+
+    // apply watershed algorithm
+    cv::watershed( map_data->whole_map, map_data->markers );
+
+#if DEBUG
+    cv::Mat markers_8U;
+    map_data->markers.convertTo( markers_8U, CV_8U );
+    cv::bitwise_and( markers_8U, map_data->map_mask, markers_8U );
+    cv::imshow( "Markers 8U", markers_8U );
+    markers_8U.release();
+#endif
+
+    // create new marked_up_image (the one we click on)
+    map_data->marked_up_image = cv::Mat::zeros( map_data->markers.size(), CV_8UC3 );
+
+    // draw original map back on
+    draw_in_states( map_data );
+
+}
 
 void
 higlight_selected_region(MapData* map_data, int marker_value)
@@ -130,7 +177,7 @@ paint_region_over_map(MapData* map_data, cv::Rect bounding_rect)
     // paint the region of interest over the map
     cv::Mat painted_map;
     try {
-        painted_map = bitwise_i1_over_i2(
+        painted_map = bitwise_i1_in_i2(
             padded_roi,
             map_data->marked_up_image,
             padded_roi_mask,
@@ -153,55 +200,39 @@ paint_region_over_map(MapData* map_data, cv::Rect bounding_rect)
 cv::Mat
 make_border_from_size_and_rect(cv::Mat image, cv::Size target_size, cv::Rect rect)
 {
-    // math
-    int top = rect.y >= 0 ? rect.y : 0;
+    // math to confuse you
+    int top = rect.y;
     int bottom = target_size.height - rect.y - rect.height;
     if (top < 0 && bottom >= 0) {
-        bottom += top;
-        top = 0;
+        bottom -= top;
     } else if (top >= 0 && bottom < 0) {
         top += bottom;
-        bottom = 0;
     }
     if (bottom < 0 && top >= 0) {
-        top += bottom;
-        bottom = 0;
+        top -= bottom;
     } else if (bottom >= 0 && top < 0) {
         bottom += top;
-        top = 0;
     }
-    // if (bottom > top) {
-    //     top += std::abs( target_size.height - (top + bottom + rect.height) );
-    // } else {
-    //     bottom += std::abs( target_size.height - (top + bottom + rect.height) );
-    // }
 
-    int left = rect.x >= 0 ? rect.x : 0;
+    // seems to be necessary to avoid weird stuff from happening on the sides
+    int left = rect.x;
     int right = target_size.width - rect.x - rect.width;
     if (left < 0 && right >= 0) {
-        right += left;
-        top = 0;
+        right -= left;
     } else if (left >= 0 && right < 0) {
         left += right;
-        right = 0;
     }
-    if (left < 0 && right >= 0) {
+    if (right < 0 && left >= 0) {
+        left -= right;
+    } else if (right >= 0 && left < 0) {
         right += left;
-        left = 0;
-    } else if (left >= 0 && right < 0) {
-        left += right;
-        right = 0;
     }
-    // if (right > left) {
-    //     left += std::abs( target_size.width - (left + right + rect.width) );
-    // } else {
-    //     right += std::abs( target_size.width - (left + right + rect.width) );
-    // }
 
 #if DEBUG
     std::cout << top << " " << bottom << " " << left << " " << right << std::endl;
 #endif
 
+    // avoid zeros
     top = top < 0 ? 0 : top;
     bottom = bottom < 0 ? 0 : bottom;
     left = left < 0 ? 0 : left;

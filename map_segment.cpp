@@ -12,9 +12,11 @@
 #include "./include/canny.hpp"
 #include "./include/cla_parse.hpp"
 #include "./include/dir_func.hpp"
+#include "./include/equalize.hpp"
 #include "./include/map_helper.hpp"
 #include "./include/mouse_callback.hpp"
-#include "./include/segment_helper.hpp"
+#include "./include/rectangle.hpp"
+#include "./include/segmentation.hpp"
 
 #define DEBUG 0
 
@@ -33,50 +35,6 @@ wait_key()
         return 0;
     }
     return 1;
-}
-
-// perform segmentation using canny edges, thresholding, and distance transform
-void
-segment(MapData* map_data, int hsv_plane = 2)
-{
-    // canny edge detection, returning contour map
-    cv::Mat canny_edges = draw_color_canny_contours( map_data->whole_map, hsv_plane ); // for usa.png, saturation is best to use imo
-
-    // create bordered map
-    cv::Mat binary_image = create_binary_image_from_canny_edges( canny_edges, map_data->map_mask );
-    canny_edges.release();
-
-    // distance transform on thresholded
-    cv::Mat distance_transform = distance_finder( binary_image );
-    binary_image.release();
-
-    // find contours of distance transform
-    map_data->contours = find_distance_contours( distance_transform );
-
-    // find boundaries of the contours
-    map_data->boundaries = draw_bounding_rects( map_data->contours );
-
-    // create markers for foreground objects // aka "markers"
-    map_data->markers = draw_contours_as_markers( map_data->contours, distance_transform.size() );
-    distance_transform.release();
-
-    // apply watershed algorithm
-    cv::watershed( map_data->whole_map, map_data->markers );
-
-#if DEBUG
-    cv::Mat markers_8U;
-    map_data->markers.convertTo( markers_8U, CV_8U );
-    cv::bitwise_and( markers_8U, map_data->map_mask, markers_8U );
-    cv::imshow( "Markers 8U", markers_8U );
-    markers_8U.release();
-#endif
-
-    // create new marked_up_image (the one we click on)
-    map_data->marked_up_image = cv::Mat::zeros( map_data->markers.size(), CV_8UC3 );
-
-    // draw original map back on
-    draw_in_states( map_data );
-
 }
 
 

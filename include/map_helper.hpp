@@ -22,6 +22,8 @@ typedef struct {
 } MapData;
 
 
+void segment(MapData* map_data, int hsv_plane = 2);
+
 void higlight_selected_region(MapData* map_data, int marker_value);
 
 cv::Mat extract_selected_region(MapData* map_data, int marker_value);

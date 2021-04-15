@@ -35,7 +35,20 @@ Usage: map_segment.exe [params] input_image output_image
                 Output Image
 
 ```
+----
 
+#### Sad Make Stats
+From a fresh `make destroy`.
+```
+map_helper.cpp:57:9: error: 'imshow' is not a member of 'cv'
+     cv::imshow( "Markers 8U", markers_8U );
+         ^~~~~~
+make: *** [Makefile:19: map_helper.o] Error 1
+
+real    8m30.558s
+user    0m0.000s
+sys     0m0.015s
+```
 ----
 
 https://github.com/ahester57/image_segmentation
