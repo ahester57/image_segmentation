@@ -48,7 +48,7 @@ main(int argc, const char** argv)
     float scale_image_value;
     bool blur_output;
     bool equalize_output;
-    bool pad_input = true;
+    bool pad_input = false;
 
     // parse and save command line args
     int parse_result = parse_arguments(

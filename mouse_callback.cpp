@@ -62,7 +62,7 @@ mouse_callback_draw_zeros(int event, int x, int y, int d, void* userdata)
             }
 
             // extract region_of_interest
-            higlight_selected_region( map_data, marker_value );
+            select_region( map_data, marker_value );
 
             // show region_of_interest in new window
             // cv::imshow( "region_of_interest", map_data->region_of_interest );

@@ -16,7 +16,7 @@
 #include "./include/region_of_interest.hpp"
 #include "./include/segmentation.hpp"
 
-#define DEBUG 0
+#define DEBUG 1
 
 #if DEBUG
     #include <opencv2/highgui/highgui.hpp>
@@ -52,7 +52,7 @@ segment(MapData* map_data, int hsv_plane)
     // apply watershed algorithm
     cv::watershed( map_data->whole_map, map_data->markers );
 
-#if DEBUG
+#if DEBUG > 1
     cv::Mat markers_8U;
     map_data->markers.convertTo( markers_8U, CV_8U );
     cv::bitwise_and( markers_8U, map_data->map_mask, markers_8U );
@@ -69,7 +69,7 @@ segment(MapData* map_data, int hsv_plane)
 }
 
 void
-higlight_selected_region(MapData* map_data, int marker_value)
+select_region(MapData* map_data, int marker_value)
 {
 
     // zero-out region of interest
@@ -79,7 +79,7 @@ higlight_selected_region(MapData* map_data, int marker_value)
     draw_in_states( map_data );
 
     // highlight selected region
-    draw_in_roi( map_data, marker_value );
+    // draw_in_roi( map_data, marker_value );
 
     // get bounding rect
     cv::Rect bounding_rect = map_data->boundaries[marker_value - 1];
@@ -139,9 +139,24 @@ paint_map_atop_region(MapData* map_data, int marker_value, cv::Mat drawn_contour
     // paint region using porter duff
     cv::Mat painted_region;
     try {
-        painted_region = bitwise_i1_atop_i2( map_data->whole_map, contour_8u3, map_mask_8u, drawn_contour );
-    } catch (...) {
+        painted_region = bitwise_i1_atop_i2(
+            map_data->whole_map,
+            contour_8u3,
+            map_mask_8u,
+            drawn_contour
+        );
+    } catch (std::string &str) {
         std::cerr << "ERROR : paint_map_atop_region" << std::endl;
+        std::cerr << "Error: " << str << std::endl;
+    } catch (cv::Exception &e) {
+        std::cerr << "ERROR : paint_map_atop_region" << std::endl;
+        std::cerr << "Error: " << e.msg << std::endl;
+    } catch (std::runtime_error &re) {
+        std::cerr << "ERROR : paint_map_atop_region" << std::endl;
+        std::cerr << "Error: " << re.what() << std::endl;
+    }
+
+    if (painted_region.empty()) {
         map_data->whole_map.copyTo( painted_region );
     }
 
@@ -168,6 +183,16 @@ paint_region_over_map(MapData* map_data, cv::Rect bounding_rect)
 
     // pad roi mask
     cv::Mat padded_roi_mask = make_border_from_size_and_rect(roi_8u, map_mask_8u.size(), bounding_rect);
+    // cv::Mat::zeros( map_mask_8u.size(), map_mask_8u.type() );
+    // cv::Mat center_roi_mask = padded_roi_mask( cv::Rect(
+    //     bounding_rect.x,
+    //     bounding_rect.y,
+    //     roi_8u.size().width,
+    //     roi_8u.size().height
+    // ));
+    // roi_8u.copyTo( center_roi_mask );
+    // center_roi_mask.copyTo (padded_roi_mask( bounding_rect ) );
+    // cv:imshow( "padd_mask", padded_roi_mask );
 
 #if DEBUG
     std::cout << cv_type_to_str( map_mask_8u ) << " :: " << cv_type_to_str( padded_roi_mask ) << std::endl;
@@ -183,8 +208,18 @@ paint_region_over_map(MapData* map_data, cv::Rect bounding_rect)
             padded_roi_mask,
             padded_roi_mask
         );
-    } catch (...) {
+    } catch (std::string &str) {
+        std::cerr << "ERROR : paint_map_atop_region" << std::endl;
+        std::cerr << "Error: " << str << std::endl;
+    } catch (cv::Exception &e) {
+        std::cerr << "ERROR : paint_map_atop_region" << std::endl;
+        std::cerr << "Error: " << e.msg << std::endl;
+    } catch (std::runtime_error &re) {
         std::cerr << "ERROR : paint_region_over_map" << std::endl;
+        std::cerr << "Error: " << re.what() << std::endl;
+    }
+
+    if (painted_map.empty()) {
         map_data->marked_up_image.copyTo( painted_map );
     }
 
